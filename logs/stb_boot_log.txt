@@ -1,0 +1,738 @@
+~~~~..........................................................................set vcck to 1120 mv
+set vddee to 1000 mv
+
+
+U-Boot 2015.01 (Aug 15 2018 - 12:27:30)
+
+DRAM:  2 GiB
+Relocation Offset is: 76ec9000
+gpio: pin GPIOAO_6 (gpio 106) value is 0
+gpio: pin GPIOH_8 (gpio 57) value is 1
+gpio: pin GPIOH_9 (gpio 58) value is 0
+gpio: pin GPIOAO_9 (gpio 109) value is 0
+gpio: pin GPIOAO_5 (gpio 105) value is 1
+register usb cfg[0][1] = 0000000077f5f9d8
+vpu: error: vpu: check dts: FDT_ERR_BADMAGIC, load default parameters
+vpu: clk_level = 7
+vpu: set clk: 666667000Hz, readback: 666660000Hz(0x300)
+vpp: vpp_init
+boot_device_flag : 1
+Nand PHY Ver:1.01.001.0006 (c) 2013 Amlogic Inc.
+init bus_cycle=6, bus_timing=7, system=5.0ns
+reset failed
+get_chip_type and ret:fffffffe
+get_chip_type and ret:fffffffe
+chip detect failed and ret:fffffffe
+nandphy_init failed and ret=0xfffffff1
+MMC:   aml_priv->desc_buf = 0x0000000073ec9dd0
+aml_priv->desc_buf = 0x0000000073ecc0f0
+SDIO Port B: 0, SDIO Port C: 1
+emmc/sd response timeout, cmd8, status=0x1ff2800
+emmc/sd response timeout, cmd55, status=0x1ff2800
+[mmc_init] mmc init success
+mmc read lba=0x14000, blocks=0x400
+      Amlogic multi-dtb tool
+      Cannot find legal dtb!
+start dts,buffer=0000000073ece970,dt_addr=0000000073ece970
+get_partition_from_dts: FDT_ERR_BADMAGIC
+!!!!get dts FAILED
+mmc get partition error!
+get partition info failed !!
+Using default environment
+
+In:    serial
+Out:   serial
+Err:   serial
+reboot_mode=cold_boot
+board_late_init,defenv!
+hpd_state=1
+[1080p60hz] is invalid for cvbs.
+set hdmitx VIC = 16
+config HPLL = 2970
+HPLL: 0xc000027b
+config HPLL done
+j = 4  vid_clk_div = 1
+hdmitx phy setting done
+hdmitx: set enc for VIC: 16
+rx version is 1.4 or below  div=10
+hdmtix: set audio
+[store]To run cmd[emmc dtb_read 0x1000000 0x40000]
+read emmc dtb
+      Amlogic multi-dtb tool
+      Cannot find legal dtb!
+[store]Err:do_store_dtb_ops,L234:Fail in fdt check header
+board_late_init(): [store dtb read $dtb_mem_addr] fail
+load dtb to 1000000
+[store]To run cmd[emmc dtb_read 1000000 0x40000]
+read emmc dtb
+      Amlogic multi-dtb tool
+      Cannot find legal dtb!
+[store]Err:do_store_dtb_ops,L234:Fail in fdt check header
+board_late_init(): store dtb read 1000000 fail
+Net:   dwmac.c9410000
+wipe_data=successful
+wipe_cache=successful
+upgrade_step=0
+[OSD]check dts: FDT_ERR_BADMAGIC, load default fb_addr parameters
+[OSD]fb_addr for logo: 0x3d800000
+[OSD]check dts: FDT_ERR_BADMAGIC, load default fb_addr parameters
+[OSD]fb_addr for logo: 0x3d800000
+[CANVAS]canvas init
+[CANVAS]addr=0x3d800000 width=3840, height=2160
+Cannot find dev.
+amlmmc cmd <NULL> failed 
+
+store - STORE sub-system
+
+Usage:
+store store init flag
+store read name addr off|partition size
+    read 'size' bytes starting at offset 'off'
+    to/from memory address 'addr', skipping bad blocks.
+store write name addr off|partition size
+    write 'size' bytes starting at offset 'off'
+    to/from memory address 'addr', skipping bad blocks.
+store rom_write add off size.
+	write uboot to the boot device
+store erase boot/data: 
+	erase the area which is uboot or data 
+store erase partition <partition_name>: 
+	erase the area which partition in u-boot 
+store erase dtb 
+store erase key 
+store disprotect key 
+store rom_protect on/off 
+store scrub off|partition size
+	scrub the area from offset and size 
+store dtb iread/read/write addr <size>
+	read/write dtb, size is optional 
+store key read/write addr <size>
+	read/write key, size is optional 
+
+cmd store failed 
+Err imgread(L333):Fail to read 0x2000B from part[logo] at offset 0
+There is no valid bmp file at the given address
+[KM]Error:f[keymanage_dts_parse]L282:not a fdt at 0x0000000001000000
+gpio: pin GPIOAO_2 (gpio 102) value is 1
+InUsbBurn
+noSof
+Hit Enter or space or Ctrl+C key to stop autoboot -- :  1  0 
+Cannot find dev.
+amlmmc cmd <NULL> failed 
+
+store - STORE sub-system
+
+Usage:
+store store init flag
+store read name addr off|partition size
+    read 'size' bytes starting at offset 'off'
+    to/from memory address 'addr', skipping bad blocks.
+store write name addr off|partition size
+    write 'size' bytes starting at offset 'off'
+    to/from memory address 'addr', skipping bad blocks.
+store rom_write add off size.
+	write uboot to the boot device
+store erase boot/data: 
+	erase the area which is uboot or data 
+store erase partition <partition_name>: 
+	erase the area which partition in u-boot 
+store erase dtb 
+store erase key 
+store disprotect key 
+store rom_protect on/off 
+store scrub off|partition size
+	scrub the area from offset and size 
+store dtb iread/read/write addr <size>
+	read/write dtb, size is optional 
+store key read/write addr <size>
+	read/write key, size is optional 
+
+cmd store failed 
+Err imgread(L132):Fail to read 0x100000B from part[boot] at offset 0
+InUsbBurn
+noSof
+card in
+[mmc_init] mmc init success
+Device: SDIO Port B
+Manufacturer ID: 3
+OEM: 5344
+Name: SC32G 
+Tran Speed: 50000000
+Rd Block Len: 512
+SD version 3.0
+High Capacity: Yes
+Capacity: 29.7 GiB
+mmc clock: 40000000
+Bus Width: 4-bit
+Device: SDIO Port B
+Manufacturer ID: 3
+OEM: 5344
+Name: SC32G 
+Tran Speed: 50000000
+Rd Block Len: 512
+SD version 3.0
+High Capacity: Yes
+Capacity: 29.7 GiB
+mmc clock: 40000000
+Bus Width: 4-bit
+reading aml_autoscript
+1351 bytes read in 3 ms (439.5 KiB/s)
+## Executing script at 01080000
+start amlogic old u-boot
+reading boot_android
+** Unable to read file boot_android **
+** Bad device usb 0 **
+reading u-boot.ext
+646455 bytes read in 39 ms (15.8 MiB/s)
+## Starting application at 0x01000000 ...
+[    0.000000] Booting Linux on physical CPU 0x0000000000 [0x410fd034]
+[    0.000000] Linux version 6.18.26-current-meson64 (build@armbian) (aarch64-linux-gnu-gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #1 SMP PREEMPT Thu Apr 30 09:13:53 UTC 2026
+[    0.000000] KASLR disabled due to lack of seed
+[    0.000000] Machine model: ZTE B860H
+[    0.000000] efi: UEFI not found.
+[    0.000000] Reserved memory: created CMA memory pool at 0x000000005a400000, size 512 MiB
+[    0.000000] OF: reserved mem: initialized node linux,cma, compatible id shared-dma-pool
+[    0.000000] OF: reserved mem: 0x000000005a400000..0x000000007a3fffff (524288 KiB) map reusable linux,cma
+[    0.000000] OF: reserved mem: 0x0000000000000000..0x0000000000ffffff (16384 KiB) nomap non-reusable hwrom@0
+[    0.000000] OF: reserved mem: 0x0000000005000000..0x00000000052fffff (3072 KiB) nomap non-reusable secmon@5000000
+[    0.000000] OF: reserved mem: 0x0000000005300000..0x00000000072fffff (32768 KiB) nomap non-reusable secmon@5300000
+[    0.000000] NUMA: Faking a node at [mem 0x0000000000000000-0x000000007fbeefff]
+[    0.000000] NODE_DATA(0) allocated [mem 0x7f7e4a80-0x7f7e727f]
+[    0.000000] Zone ranges:
+[    0.000000]   DMA      [mem 0x0000000000000000-0x000000007fbeefff]
+[    0.000000]   DMA32    empty
+[    0.000000]   Normal   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000000000000-0x0000000000ffffff]
+[    0.000000]   node   0: [mem 0x0000000001000000-0x0000000004ffffff]
+[    0.000000]   node   0: [mem 0x0000000005000000-0x00000000072fffff]
+[    0.000000]   node   0: [mem 0x0000000007300000-0x000000007fbeefff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000000000000-0x000000007fbeefff]
+[    0.000000] On node 0, zone DMA: 1041 pages in unavailable ranges
+[    0.000000] psci: probing for conduit method from DT.
+[    0.000000] psci: PSCIv0.2 detected in firmware.
+[    0.000000] psci: Using standard PSCI v0.2 function IDs
+[    0.000000] psci: Trusted OS migration not required
+[    0.000000] percpu: Embedded 34 pages/cpu s101016 r8192 d30056 u139264
+[    0.000000] Detected VIPT I-cache on CPU0
+[    0.000000] CPU features: detected: ARM erratum 845719
+[    0.000000] alternatives: applying boot alternatives
+[    0.000000] Kernel command line: root=UUID=baa5907c-d9ad-4451-8998-2de045553899 rootflags=data=writeback console=ttyAML0,115200n8 console=tty0 rw no_console_suspend consoleblank=0 fsck.fix=yes fsck.repair=yes net.ifnames=0 splash plymouth.ignore-serial-consoles
+[    0.000000] Unknown kernel command line parameters "splash", will be passed to user space.
+[    0.000000] printk: log buffer data + meta data: 131072 + 458752 = 589824 bytes
+[    0.000000] Dentry cache hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 131072 (order: 8, 1048576 bytes, linear)
+[    0.000000] software IO TLB: SWIOTLB bounce buffer size adjusted to 1MB
+[    0.000000] software IO TLB: area num 4.
+[    0.000000] software IO TLB: mapped [mem 0x000000007d200000-0x000000007d400000] (2MB)
+[    0.000000] Fallback order for Node 0: 0 
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 523247
+[    0.000000] Policy zone: DMA
+[    0.000000] mem auto-init: stack:all(zero), heap alloc:on, heap free:off
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=4, Nodes=1
+[    0.000000] ftrace: allocating 59137 entries in 232 pages
+[    0.000000] ftrace: allocated 232 pages with 4 groups
+[    0.000000] rcu: Preemptible hierarchical RCU implementation.
+[    0.000000] rcu: 	RCU event tracing is enabled.
+[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=256 to nr_cpu_ids=4.
+[    0.000000] 	Trampoline variant of Tasks RCU enabled.
+[    0.000000] 	Rude variant of Tasks RCU enabled.
+[    0.000000] 	Tracing variant of Tasks RCU enabled.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=4
+[    0.000000] RCU Tasks: Setting shift to 2 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=4.
+[    0.000000] RCU Tasks Rude: Setting shift to 2 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=4.
+[    0.000000] RCU Tasks Trace: Setting shift to 2 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=4.
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] Root IRQ handler: gic_handle_irq
+[    0.000000] GIC: Using split EOI/Deactivate mode
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] arch_timer: cp15 timer running at 24.00MHz (phys).
+[    0.000000] clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0x588fe9dc0, max_idle_ns: 440795202592 ns
+[    0.000000] sched_clock: 56 bits at 24MHz, resolution 41ns, wraps every 4398046511097ns
+[    0.000298] Console: colour dummy device 80x25
+[    0.000312] printk: legacy console [tty0] enabled
+[    0.001016] Calibrating delay loop (skipped), value calculated using timer frequency.. 48.00 BogoMIPS (lpj=96000)
+[    0.001044] pid_max: default: 32768 minimum: 301
+[    0.001155] LSM: initializing lsm=capability,yama,apparmor
+[    0.001221] Yama: becoming mindful.
+[    0.001478] AppArmor: AppArmor initialized
+[    0.001586] Mount-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.001615] Mountpoint-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.004205] rcu: Hierarchical SRCU implementation.
+[    0.004243] rcu: 	Max phase no-delay instances is 1000.
+[    0.004525] Timer migration: 1 hierarchy levels; 8 children per group; 1 crossnode level
+[    0.005485] EFI services will not be available.
+[    0.005913] smp: Bringing up secondary CPUs ...
+[    0.006610] Detected VIPT I-cache on CPU1
+[    0.006774] CPU1: Booted secondary processor 0x0000000001 [0x410fd034]
+[    0.007672] Detected VIPT I-cache on CPU2
+[    0.007833] CPU2: Booted secondary processor 0x0000000002 [0x410fd034]
+[    0.008776] Detected VIPT I-cache on CPU3
+[    0.008938] CPU3: Booted secondary processor 0x0000000003 [0x410fd034]
+[    0.009075] smp: Brought up 1 node, 4 CPUs
+[    0.009153] SMP: Total of 4 processors activated.
+[    0.009166] CPU: All CPU(s) started at EL2
+[    0.009211] CPU features: detected: 32-bit EL0 Support
+[    0.009225] CPU features: detected: 32-bit EL1 Support
+[    0.009241] CPU features: detected: CRC32 instructions
+[    0.009262] CPU features: detected: PMUv3
+[    0.009321] alternatives: applying system-wide alternatives
+[    0.010703] Memory: 1399540K/2092988K available (18816K kernel code, 2562K rwdata, 12428K rodata, 7424K init, 582K bss, 163788K reserved, 524288K cma-reserved)
+[    0.011800] devtmpfs: initialized
+[    0.018955] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[    0.019037] posixtimers hash table entries: 2048 (order: 3, 32768 bytes, linear)
+[    0.019115] futex hash table entries: 1024 (65536 bytes on 1 NUMA nodes, total 64 KiB, linear).
+[    0.026626] 22256 pages in range for non-PLT usage
+[    0.026647] 513776 pages in range for PLT usage
+[    0.026877] pinctrl core: initialized pinctrl subsystem
+[    0.027570] DMI not present or invalid.
+[    0.030465] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.032561] DMA: preallocated 256 KiB GFP_KERNEL pool for atomic allocations
+[    0.033555] DMA: preallocated 256 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+[    0.034833] DMA: preallocated 256 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+[    0.034930] audit: initializing netlink subsys (disabled)
+[    0.035249] audit: type=2000 audit(0.032:1): state=initialized audit_enabled=0 res=1
+[    0.035797] thermal_sys: Registered thermal governor 'fair_share'
+[    0.035807] thermal_sys: Registered thermal governor 'bang_bang'
+[    0.035824] thermal_sys: Registered thermal governor 'step_wise'
+[    0.035838] thermal_sys: Registered thermal governor 'user_space'
+[    0.035917] cpuidle: using governor menu
+[    0.036334] hw-breakpoint: found 6 breakpoint and 4 watchpoint registers.
+[    0.036472] ASID allocator initialised with 65536 entries
+[    0.036779] Serial: AMBA PL011 UART driver
+[    0.041799] /soc/interrupt-controller@c4301000: Fixed dependency cycle(s) with /soc/interrupt-controller@c4301000
+[    0.042103] /soc/vpu@d0100000: Fixed dependency cycle(s) with /soc/hdmi-tx@c883a000
+[    0.042147] /soc/hdmi-tx@c883a000: Fixed dependency cycle(s) with /soc/vpu@d0100000
+[    0.049272] /soc/vpu@d0100000: Fixed dependency cycle(s) with /soc/hdmi-tx@c883a000
+[    0.049500] /soc/vpu@d0100000: Fixed dependency cycle(s) with /soc/hdmi-tx@c883a000
+[    0.049580] /soc/hdmi-tx@c883a000: Fixed dependency cycle(s) with /soc/vpu@d0100000
+[    0.051787] /soc/vpu@d0100000: Fixed dependency cycle(s) with /cvbs-connector
+[    0.051891] /cvbs-connector: Fixed dependency cycle(s) with /soc/vpu@d0100000
+[    0.052066] /soc/hdmi-tx@c883a000: Fixed dependency cycle(s) with /hdmi-connector
+[    0.052152] /hdmi-connector: Fixed dependency cycle(s) with /soc/hdmi-tx@c883a000
+[    0.054025] HugeTLB: registered 1.00 GiB page size, pre-allocated 0 pages
+[    0.054064] HugeTLB: 0 KiB vmemmap can be freed for a 1.00 GiB page
+[    0.054081] HugeTLB: registered 32.0 MiB page size, pre-allocated 0 pages
+[    0.054095] HugeTLB: 0 KiB vmemmap can be freed for a 32.0 MiB page
+[    0.054110] HugeTLB: registered 2.00 MiB page size, pre-allocated 0 pages
+[    0.054124] HugeTLB: 0 KiB vmemmap can be freed for a 2.00 MiB page
+[    0.054139] HugeTLB: registered 64.0 KiB page size, pre-allocated 0 pages
+[    0.054153] HugeTLB: 0 KiB vmemmap can be freed for a 64.0 KiB page
+[    0.056669] ACPI: Interpreter disabled.
+[    0.057302] iommu: Default domain type: Translated
+[    0.057340] iommu: DMA domain TLB invalidation policy: strict mode
+[    0.059396] SCSI subsystem initialized
+[    0.059689] usbcore: registered new interface driver usbfs
+[    0.059739] usbcore: registered new interface driver hub
+[    0.059793] usbcore: registered new device driver usb
+[    0.060145] pps_core: LinuxPPS API ver. 1 registered
+[    0.060163] pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+[    0.060193] PTP clock support registered
+[    0.060237] EDAC MC: Ver: 3.0.0
+[    0.060836] scmi_core: SCMI protocol bus registered
+[    0.062475] NetLabel: Initializing
+[    0.062508] NetLabel:  domain hash size = 128
+[    0.062520] NetLabel:  protocols = UNLABELED CIPSOv4 CALIPSO
+[    0.062597] NetLabel:  unlabeled traffic allowed by default
+[    0.062611] mctp: management component transport protocol core
+[    0.062625] NET: Registered PF_MCTP protocol family
+[    0.062931] vgaarb: loaded
+[    0.063570] clocksource: Switched to clocksource arch_sys_counter
+[    0.153702] VFS: Disk quotas dquot_6.6.0
+[    0.153764] VFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)
+[    0.154684] AppArmor: AppArmor Filesystem Enabled
+[    0.154816] pnp: PnP ACPI: disabled
+[    0.163120] NET: Registered PF_INET protocol family
+[    0.163339] IP idents hash table entries: 32768 (order: 6, 262144 bytes, linear)
+[    0.225916] tcp_listen_portaddr_hash hash table entries: 1024 (order: 2, 16384 bytes, linear)
+[    0.226092] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    0.226169] TCP established hash table entries: 16384 (order: 5, 131072 bytes, linear)
+[    0.226402] TCP bind hash table entries: 16384 (order: 7, 524288 bytes, linear)
+[    0.226797] TCP: Hash tables configured (established 16384 bind 16384)
+[    0.227099] MPTCP token hash table entries: 2048 (order: 4, 49152 bytes, linear)
+[    0.227215] UDP hash table entries: 1024 (order: 4, 65536 bytes, linear)
+[    0.227307] UDP-Lite hash table entries: 1024 (order: 4, 65536 bytes, linear)
+[    0.227635] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    0.227701] PCI: CLS 0 bytes, default 64
+[    0.228000] Trying to unpack rootfs image as initramfs...
+[    0.232381] kvm [1]: nv: 568 coarse grained trap handlers
+[    0.232996] kvm [1]: IPA Size Limit: 40 bits
+[    0.235709] kvm [1]: vgic interrupt IRQ9
+[    0.235778] kvm [1]: Hyp nVHE mode initialized successfully
+[    0.238121] Initialise system trusted keyrings
+[    0.238224] Key type blacklist registered
+[    0.238494] workingset: timestamp_bits=44 max_order=19 bucket_order=0
+[    0.239146] squashfs: version 4.0 (2009/01/31) Phillip Lougher
+[    0.239927] fuse: init (API version 7.45)
+[    0.240617] integrity: Platform Keyring initialized
+[    0.240984] cryptd: max_cpu_qlen set to 1000
+[    0.241103] Key type asymmetric registered
+[    0.241118] Asymmetric key parser 'x509' registered
+[    0.241253] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 243)
+[    0.241512] io scheduler mq-deadline registered
+[    0.241550] io scheduler kyber registered
+[    0.241619] io scheduler bfq registered
+[    0.242216] irq_meson_gpio: 110 to 8 gpio interrupt mux initialized
+[    0.253597] ledtrig-cpu: registered to indicate activity on CPUs
+[    0.262431] soc soc0: Amlogic Meson GXL (S905X) Revision 21:c (84:2) Detected
+[    0.262658] meson-gx-socinfo-sm c8100140.ao-secure: no secure-monitor node found
+[    0.262698] meson-gx-socinfo-sm c8100140.ao-secure: probe with driver meson-gx-socinfo-sm failed with error -22
+[    0.265827] Serial: 8250/16550 driver, 8 ports, IRQ sharing disabled
+[    0.272619] Serial: AMBA driver
+[    0.273473] c11084c0.serial: ttyAML6 at MMIO 0xc11084c0 (irq = 14, base_baud = 1500000) is a meson_uart
+[    0.273827] serial serial0: tty port ttyAML6 registered
+[    0.274685] c81004c0.serial: ttyAML0 at MMIO 0xc81004c0 (irq = 15, base_baud = 1500000) is a meson_uart
+[    0.274745] printk: legacy console [ttyAML0] enabled
+[    1.434279] Freeing initrd memory: 24752K
+[    1.496398] loop: module loaded
+[    1.501441] tun: Universal TUN/TAP device driver, 1.6
+[    1.502642] thunder_xcv, ver 1.0
+[    1.504212] thunder_bgx, ver 1.0
+[    1.507361] nicpf, ver 1.0
+[    1.511446] e1000e: Intel(R) PRO/1000 Network Driver
+[    1.514914] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+[    1.520878] igb: Intel(R) Gigabit Ethernet Network Driver
+[    1.526119] igb: Copyright (c) 2007-2014 Intel Corporation.
+[    1.531728] igbvf: Intel(R) Gigabit Virtual Function Network Driver
+[    1.537822] igbvf: Copyright (c) 2009 - 2012 Intel Corporation.
+[    1.543990] sky2: driver version 1.30
+[    1.548350] VFIO - User Level meta-driver version: 0.3
+[    1.555519] usbcore: registered new interface driver usb-storage
+[    1.560921] mousedev: PS/2 mouse device common for all mice
+[    1.565151] i2c_dev: i2c /dev entries driver
+[    1.571663] pwrseq_emmc emmc-pwrseq: EMMC reset pin tied to a sleepy GPIO driver; reset on emergency-reboot disabled
+[    1.579254] sdhci: Secure Digital Host Controller Interface driver
+[    1.584821] sdhci: Copyright(c) Pierre Ossman
+[    1.589408] Synopsys Designware Multimedia Card Interface Driver
+[    1.596538] sdhci-pltfm: SDHCI platform and OF driver helper
+[    1.597340] meson-gx-mmc d0072000.mmc: Got CD GPIO
+[    1.597394] meson-gx-mmc d0074000.mmc: allocated mmc-pwrseq
+[    1.603124] meson-sm: secure-monitor enabled
+[    1.616436] gxl-crypto c883e000.crypto: will run requests pump with realtime priority
+[    1.623199] gxl-crypto c883e000.crypto: will run requests pump with realtime priority
+[    1.631250] hid: raw HID events driver (C) Jiri Kosina
+[    1.635847] usbcore: registered new interface driver usbhid
+[    1.639628] gpio irq setup: hwirq: 0x3A irqfirst: 0x34 irqlast: 0x3A pin[48]
+[    1.641291] usbhid: USB HID core driver
+[    1.648564] genirq: Setting trigger mode 3 for irq 20 failed (meson_gpio_irq_set_type+0x0/0x68)
+[    1.652801] platform-mhu c883c404.mailbox: Platform MHU Mailbox registered
+[    1.660634] meson-gx-mmc d0072000.mmc: error -EINVAL: request_irq(20) 0x0 mmc_gpio_cd_irqt d0072000.mmc cd
+[    1.677419] hw perfevents: enabled with armv8_cortex_a53 PMU driver, 7 (0,8000003f) counters available
+[    1.689033] NET: Registered PF_INET6 protocol family
+[    1.692583] Segment Routing with IPv6
+[    1.694741] In-situ OAM (IOAM) with IPv6
+[    1.698681] NET: Registered PF_PACKET protocol family
+[    1.703681] bridge: filtering via arp/ip/ip6tables is no longer available by default. Update your scripts to load br_netfilter if you need this.
+[    1.716722] Key type dns_resolver registered
+[    1.726094] mmc1: new high speed SDHC card at address aaaa
+[    1.728569] mmcblk1: mmc1:aaaa SC32G 29.7 GiB
+[    1.736066] registered taskstats version 1
+[    1.736650] Loading compiled-in X.509 certificates
+[    1.743085]  mmcblk1: p1 p2
+[    1.752751] zswap: loaded using pool zstd
+[    1.753092] Demotion targets for Node 0: null
+[    1.755738] Key type .fscrypt registered
+[    1.759360] Key type fscrypt-provisioning registered
+[    1.764764] Key type encrypted registered
+[    1.768818] AppArmor: AppArmor sha256 policy hashing enabled
+[    1.788038] meson-pwm c11086c0.pwm: using obsolete compatible, please consider updating dt
+[    1.793455] meson-drm d0100000.vpu: Queued 2 outputs on vpu
+[    1.794137] mmc2: new HS200 MMC card at address 0001
+[    1.802181] mmcblk2: mmc2:0001 H8G4aÆ 7.28 GiB
+[    1.807769]  mmcblk2: p1 p2
+[    1.809434] mmcblk2boot0: mmc2:0001 H8G4aÆ 4.00 MiB
+[    1.817057] mmcblk2boot1: mmc2:0001 H8G4aÆ 4.00 MiB
+[    1.819763] meson-dw-hdmi c883a000.hdmi-tx: Detected HDMI TX controller v2.01a with HDCP (meson_dw_hdmi_phy)
+[    1.821655] mmcblk2rpmb: mmc2:0001 H8G4aÆ 4.00 MiB, chardev (240:0)
+[    1.828705] meson-dw-hdmi c883a000.hdmi-tx: registered DesignWare HDMI I2C bus driver
+[    1.842013] meson-drm d0100000.vpu: bound c883a000.hdmi-tx (ops 0xffff8000813c0380)
+[    1.850235] [drm] Initialized meson 1.0.0 for d0100000.vpu on minor 0
+[    2.463338] Console: switching to colour frame buffer device 170x48
+[    2.480748] meson-drm d0100000.vpu: [drm] fb0: mesondrmfb frame buffer device
+[    2.491164] scpi_protocol scpi: SCP Protocol legacy pre-1.0 firmware
+[    2.491995] meson-gx-mmc d0070000.mmc: allocated mmc-pwrseq
+[    2.504717] dwc3-meson-g12a d0078080.usb: USB2 ports: 2
+[    2.504810] dwc3-meson-g12a d0078080.usb: USB3 ports: 0
+[    2.535145] meson-gx-mmc d0070000.mmc: card claims to support voltages below defined range
+[    2.553758] mmc0: new high speed SDIO card at address 0001
+[    3.043053] dwc2 c9100000.usb: supply vusb_d not found, using dummy regulator
+[    3.045523] dwc2 c9100000.usb: supply vusb_a not found, using dummy regulator
+[    3.052285] dwc2 c9100000.usb: EPs: 7, dedicated fifos, 712 entries in SPRAM
+[    3.060809] xhci-hcd xhci-hcd.1.auto: xHCI Host Controller
+[    3.064350] xhci-hcd xhci-hcd.1.auto: new USB bus registered, assigned bus number 1
+[    3.072046] xhci-hcd xhci-hcd.1.auto: USB3 root hub has no ports
+[    3.077849] xhci-hcd xhci-hcd.1.auto: hcc params 0x0228f664 hci version 0x100 quirks 0x0000808002000010
+[    3.087213] xhci-hcd xhci-hcd.1.auto: irq 32, io mem 0xc9000000
+[    3.093328] usb usb1: New USB device found, idVendor=1d6b, idProduct=0002, bcdDevice= 6.18
+[    3.101236] usb usb1: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+[    3.108381] usb usb1: Product: xHCI Host Controller
+[    3.113210] usb usb1: Manufacturer: Linux 6.18.26-current-meson64 xhci-hcd
+[    3.120020] usb usb1: SerialNumber: xhci-hcd.1.auto
+[    3.125540] hub 1-0:1.0: USB hub found
+[    3.128635] hub 1-0:1.0: 2 ports detected
+[    3.170751] clk: Disabling unused clocks
+[    3.171883] PM: genpd: Disabling unused power domains
+[    3.181227] Freeing unused kernel memory: 7424K
+[    3.182387] Run /init as init process
+[    3.845843] meson8b-dwmac c9410000.ethernet: IRQ eth_wake_irq not found
+[    3.847766] meson8b-dwmac c9410000.ethernet: IRQ sfty not found
+[    3.853765] meson8b-dwmac c9410000.ethernet: PTP uses main clock
+[    3.860387] meson8b-dwmac c9410000.ethernet: User ID: 0x11, Synopsys ID: 0x37
+[    3.866730] meson8b-dwmac c9410000.ethernet: 	DWMAC1000
+[    3.871802] meson8b-dwmac c9410000.ethernet: DMA HW capability register supported
+[    3.879253] meson8b-dwmac c9410000.ethernet: RX Checksum Offload Engine supported
+[    3.886644] meson8b-dwmac c9410000.ethernet: COE Type 2
+[    3.891835] meson8b-dwmac c9410000.ethernet: TX Checksum insertion supported
+[    3.898824] meson8b-dwmac c9410000.ethernet: Wake-Up On Lan supported
+[    3.908459] meson8b-dwmac c9410000.ethernet: Normal descriptors
+[    3.911030] meson8b-dwmac c9410000.ethernet: Ring mode enabled
+[    3.919254] meson8b-dwmac c9410000.ethernet: Enable RX Mitigation via HW Watchdog Timer
+[    4.251598] raid6: neonx8   gen()  2254 MB/s
+[    4.319580] raid6: neonx4   gen()  2609 MB/s
+[    4.387600] raid6: neonx2   gen()  2494 MB/s
+[    4.455597] raid6: neonx1   gen()  2125 MB/s
+[    4.523579] raid6: int64x8  gen()  1663 MB/s
+[    4.591603] raid6: int64x4  gen()  1848 MB/s
+[    4.659605] raid6: int64x2  gen()  1649 MB/s
+[    4.727590] raid6: int64x1  gen()  1218 MB/s
+[    4.728351] raid6: using algorithm neonx4 gen() 2609 MB/s
+[    4.799598] raid6: .... xor() 1852 MB/s, rmw enabled
+[    4.800345] raid6: using neon recovery algorithm
+[    4.806045] xor: measuring software checksum speed
+[    4.810121]    8regs           :  2969 MB/sec
+[    4.814939]    32regs          :  2095 MB/sec
+[    4.819272]    arm64_neon      :  1945 MB/sec
+[    4.821949] xor: using function: 8regs (2969 MB/sec)
+[    4.912609] Btrfs loaded, zoned=yes, fsverity=yes
+[    5.298444] EXT4-fs (mmcblk1p2): mounted filesystem baa5907c-d9ad-4451-8998-2de045553899 r/w with writeback data mode. Quota mode: none.
+[    6.356696] systemd[1]: System time advanced to built-in epoch: Wed 2025-09-03 18:38:20 UTC
+[    6.401824] systemd[1]: Inserted module 'autofs4'
+[    6.559117] systemd[1]: systemd 257.9-1~deb13u1 running in system mode (+PAM +AUDIT +SELINUX +APPARMOR +IMA +IPE +SMACK +SECCOMP +GCRYPT -GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +IPTC +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF -XKBCOMMON -UTMP +SYSVINIT +LIBARCHIVE)
+[    6.594668] systemd[1]: Detected architecture arm64.
+[    6.628329] systemd[1]: Hostname set to <aml-s9xx-box>.
+[    6.640708] systemd[1]: Initializing machine ID from random generator.
+[    7.044032] systemd[1]: bpf-restrict-fs: BPF LSM hook not enabled in the kernel, BPF LSM not supported.
+[    7.962109] systemd[1]: Queued start job for default target graphical.target.
+[    8.012667] systemd[1]: Created slice system-modprobe.slice - Slice /system/modprobe.
+[    8.019919] systemd[1]: Created slice system-serial\x2dgetty.slice - Slice /system/serial-getty.
+[    8.028280] systemd[1]: Created slice system-systemd\x2dfsck.slice - Slice /system/systemd-fsck.
+[    8.036360] systemd[1]: Created slice user.slice - User and Session Slice.
+[    8.041977] systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+[    8.053084] systemd[1]: Started systemd-ask-password-wall.path - Forward Password Requests to Wall Directory Watch.
+[    8.064039] systemd[1]: Set up automount proc-sys-fs-binfmt_misc.automount - Arbitrary Executable File Formats File System Automount Point.
+[    8.075717] systemd[1]: Expecting device dev-disk-by\x2duuid-4EBD\x2d65A9.device - /dev/disk/by-uuid/4EBD-65A9...
+[    8.085750] systemd[1]: Expecting device dev-ttyAML0.device - /dev/ttyAML0...
+[    8.093002] systemd[1]: Reached target paths.target - Path Units.
+[    8.098945] systemd[1]: Reached target remote-fs.target - Remote File Systems.
+[    8.106146] systemd[1]: Reached target slices.target - Slice Units.
+[    8.112379] systemd[1]: Reached target swap.target - Swaps.
+[    8.118499] systemd[1]: Listening on syslog.socket - Syslog Socket.
+[    8.130377] systemd[1]: Listening on systemd-creds.socket - Credential Encryption/Decryption.
+[    8.137136] systemd[1]: Listening on systemd-initctl.socket - initctl Compatibility Named Pipe.
+[    8.145974] systemd[1]: Listening on systemd-journald-dev-log.socket - Journal Socket (/dev/log).
+[    8.154372] systemd[1]: Listening on systemd-journald.socket - Journal Sockets.
+[    8.161699] systemd[1]: Listening on systemd-networkd.socket - Network Service Netlink Socket.
+[    8.169531] systemd[1]: systemd-pcrextend.socket - TPM PCR Measurements was skipped because of an unmet condition check (ConditionSecurity=measured-uki).
+[    8.181623] systemd[1]: systemd-pcrlock.socket - Make TPM PCR Policy was skipped because of an unmet condition check (ConditionSecurity=measured-uki).
+[    8.195498] systemd[1]: Listening on systemd-udevd-control.socket - udev Control Socket.
+[    8.204997] systemd[1]: Listening on systemd-udevd-kernel.socket - udev Kernel Socket.
+[    8.219784] systemd[1]: Mounting dev-hugepages.mount - Huge Pages File System...
+[    8.230586] systemd[1]: Mounting dev-mqueue.mount - POSIX Message Queue File System...
+[    8.242748] systemd[1]: Mounting run-lock.mount - Legacy Locks Directory /run/lock...
+[    8.256431] systemd[1]: Mounting sys-kernel-debug.mount - Kernel Debug File System...
+[    8.268026] systemd[1]: Mounting sys-kernel-tracing.mount - Kernel Trace File System...
+[    8.288363] systemd[1]: Starting fake-hwclock-load.service - Restore the current clock...
+[    8.308175] systemd[1]: Starting keyboard-setup.service - Set the console keyboard layout...
+[    8.320449] systemd[1]: Starting kmod-static-nodes.service - Create List of Static Device Nodes...
+[    8.333894] systemd[1]: Starting modprobe@configfs.service - Load Kernel Module configfs...
+[    8.348325] systemd[1]: Starting modprobe@drm.service - Load Kernel Module drm...
+[    8.368835] systemd[1]: Starting modprobe@efi_pstore.service - Load Kernel Module efi_pstore...
+[    8.381270] systemd[1]: Starting modprobe@fuse.service - Load Kernel Module fuse...
+[    8.393342] systemd[1]: netplan-ovs-cleanup.service - OpenVSwitch configuration for cleanup was skipped because of an unmet condition check (ConditionFileIsExecutable=/usr/bin/ovs-vsctl).
+[    8.407663] systemd[1]: systemd-hibernate-clear.service - Clear Stale Hibernate Storage Info was skipped because of an unmet condition check (ConditionPathExists=/sys/firmware/efi/efivars/HibernateLocation-8cf2644b-4b0b-428f-9387-6d876050dc67).
+[    8.440497] systemd[1]: Starting systemd-modules-load.service - Load Kernel Modules...
+[    8.457082] systemd[1]: Starting systemd-network-generator.service - Generate network units from Kernel command line...
+[    8.469223] systemd[1]: systemd-pcrmachine.service - TPM PCR Machine ID Measurement was skipped because of an unmet condition check (ConditionSecurity=measured-uki).
+[    8.469653] systemd[1]: systemd-tpm2-setup-early.service - Early TPM SRK Setup was skipped because of an unmet condition check (ConditionSecurity=measured-uki).
+[    8.480693] systemd[1]: Starting systemd-udev-load-credentials.service - Load udev Rules from Credentials...
+[    8.514307] systemd[1]: Starting systemd-udev-trigger.service - Coldplug All udev Devices...
+[    8.546375] systemd[1]: Mounted dev-hugepages.mount - Huge Pages File System.
+[    8.552232] systemd[1]: Mounted dev-mqueue.mount - POSIX Message Queue File System.
+[    8.560376] systemd[1]: Mounted run-lock.mount - Legacy Locks Directory /run/lock.
+[    8.567854] systemd[1]: Mounted sys-kernel-debug.mount - Kernel Debug File System.
+[    8.574597] systemd[1]: Mounted sys-kernel-tracing.mount - Kernel Trace File System.
+[    8.583098] systemd[1]: fake-hwclock-load.service: Deactivated successfully.
+[    8.587993] systemd[1]: Finished fake-hwclock-load.service - Restore the current clock.
+[    8.598600] systemd[1]: Finished kmod-static-nodes.service - Create List of Static Device Nodes.
+[    8.606451] systemd[1]: modprobe@configfs.service: Deactivated successfully.
+[    8.611512] systemd[1]: Finished modprobe@configfs.service - Load Kernel Module configfs.
+[    8.621804] systemd[1]: modprobe@drm.service: Deactivated successfully.
+[    8.626551] systemd[1]: Finished modprobe@drm.service - Load Kernel Module drm.
+[    8.635807] systemd[1]: modprobe@efi_pstore.service: Deactivated successfully.
+[    8.640586] systemd[1]: Finished modprobe@efi_pstore.service - Load Kernel Module efi_pstore.
+[    8.651631] systemd[1]: modprobe@fuse.service: Deactivated successfully.
+[    8.655506] systemd[1]: Finished modprobe@fuse.service - Load Kernel Module fuse.
+[    8.665369] systemd[1]: Finished systemd-modules-load.service - Load Kernel Modules.
+[    8.673649] systemd[1]: Finished systemd-network-generator.service - Generate network units from Kernel command line.
+[    8.686143] systemd[1]: Finished systemd-udev-load-credentials.service - Load udev Rules from Credentials.
+[    8.697796] systemd[1]: Reached target network-pre.target - Preparation for Network.
+[    8.707478] systemd[1]: Mounting sys-fs-fuse-connections.mount - FUSE Control File System...
+[    8.723973] systemd[1]: Mounting sys-kernel-config.mount - Kernel Configuration File System...
+[    8.733315] systemd[1]: systemd-fsck-root.service - File System Check on Root Device was skipped because of an unmet condition check (ConditionPathExists=!/run/initramfs/fsck-root).
+[    8.751361] systemd[1]: Starting systemd-remount-fs.service - Remount Root and Kernel File Systems...
+[    8.774154] systemd[1]: Starting systemd-sysctl.service - Apply Kernel Variables...
+[    8.800277] systemd[1]: Starting systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully...
+[    8.823247] systemd[1]: Finished keyboard-setup.service - Set the console keyboard layout.
+[    8.845015] systemd[1]: Mounted sys-fs-fuse-connections.mount - FUSE Control File System.
+[    8.854005] systemd[1]: Mounted sys-kernel-config.mount - Kernel Configuration File System.
+[    8.883690] EXT4-fs (mmcblk1p2): re-mounted baa5907c-d9ad-4451-8998-2de045553899.
+[    8.887990] systemd[1]: Finished systemd-sysctl.service - Apply Kernel Variables.
+[    8.897908] systemd[1]: Finished systemd-remount-fs.service - Remount Root and Kernel File Systems.
+[    8.907082] systemd[1]: systemd-hwdb-update.service - Rebuild Hardware Database was skipped because no trigger condition checks were met.
+[    8.916003] systemd[1]: systemd-pstore.service - Platform Persistent Storage Archival was skipped because of an unmet condition check (ConditionDirectoryNotEmpty=/sys/fs/pstore).
+[    8.936508] systemd[1]: Starting systemd-random-seed.service - Load/Save OS Random Seed...
+[    8.942564] systemd[1]: systemd-tpm2-setup.service - TPM SRK Setup was skipped because of an unmet condition check (ConditionSecurity=measured-uki).
+[    8.955844] systemd[1]: Finished systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully.
+[    8.972057] systemd[1]: Starting systemd-sysusers.service - Create System Users...
+[    9.060007] systemd[1]: Finished systemd-sysusers.service - Create System Users.
+[    9.073130] systemd[1]: Starting systemd-resolved.service - Network Name Resolution...
+[    9.092251] systemd[1]: Starting systemd-timesyncd.service - Network Time Synchronization...
+[    9.112780] systemd[1]: Starting systemd-tmpfiles-setup-dev.service - Create Static Device Nodes in /dev...
+[    9.135772] systemd[1]: Finished systemd-udev-trigger.service - Coldplug All udev Devices.
+[    9.207349] systemd[1]: Finished systemd-tmpfiles-setup-dev.service - Create Static Device Nodes in /dev.
+[    9.215405] systemd[1]: Reached target local-fs-pre.target - Preparation for Local File Systems.
+[    9.236234] systemd[1]: Starting systemd-udevd.service - Rule-based Manager for Device Events and Files...
+[    9.374379] systemd[1]: Started systemd-timesyncd.service - Network Time Synchronization.
+[    9.382014] systemd[1]: Reached target time-set.target - System Time Set.
+[    9.538346] systemd[1]: Mounting tmp.mount - /tmp...
+[    9.590527] systemd[1]: Mounted tmp.mount - /tmp.
+[    9.600005] systemd[1]: Started systemd-udevd.service - Rule-based Manager for Device Events and Files.
+[    9.620295] systemd[1]: Starting systemd-networkd.service - Network Configuration...
+[   10.087222] systemd[1]: Found device dev-ttyAML0.device - /dev/ttyAML0.
+[   10.127723] cfg80211: Loading compiled-in X.509 certificates for regulatory database
+[   10.155634] Loaded X.509 cert 'sforshee: 00b28ddf47aef9cea7'
+[   10.157691] Loaded X.509 cert 'wens: 61c038651aabdcf94bd0ac7ff06c7248db18c600'
+[   10.251620] random: crng init done
+[   10.317842] systemd[1]: Finished systemd-random-seed.service - Load/Save OS Random Seed.
+[   10.361585] systemd[1]: first-boot-complete.target - First Boot Complete was skipped because of an unmet condition check (ConditionFirstBoot=yes).
+[   10.391807] systemd[1]: Started systemd-networkd.service - Network Configuration.
+[   10.428289] meson8b-dwmac c9410000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-0
+[   10.491730] meson8b-dwmac c9410000.ethernet eth0: PHY [mdio_mux-0.e40908ff:08] driver [Meson GXL Internal PHY] (irq=34)
+[   10.507702] meson8b-dwmac c9410000.ethernet eth0: No Safety Features support found
+[   10.511972] meson8b-dwmac c9410000.ethernet eth0: PTP not supported by HW
+[   10.517761] meson8b-dwmac c9410000.ethernet eth0: configuring for phy/rmii link mode
+[   10.564118] systemd[1]: Found device dev-disk-by\x2duuid-4EBD\x2d65A9.device - /dev/disk/by-uuid/4EBD-65A9.
+[   10.571996] systemd[1]: Started systemd-resolved.service - Network Name Resolution.
+[   10.579249] systemd[1]: Reached target nss-lookup.target - Host and Network Name Lookups.
+[   10.591276] systemd[1]: Starting systemd-fsck@dev-disk-by\x2duuid-4EBD\x2d65A9.service - File System Check on /dev/disk/by-uuid/4EBD-65A9...
+[   10.606298] systemd[1]: Starting systemd-networkd-persistent-storage.service - Enable Persistent Storage in systemd-networkd...
+[   10.738197] systemd[1]: Finished systemd-networkd-persistent-storage.service - Enable Persistent Storage in systemd-networkd.
+[   10.775757] Registered IR keymap rc-empty
+[   10.784392] rc rc0: meson-ir as /devices/platform/soc/c8100000.bus/c8100580.ir/rc/rc0
+[   10.787111] mc: Linux media interface: v0.10
+[   10.806933] rc rc0: lirc_dev: driver meson-ir registered at minor = 0, raw IR receiver, no transmitter
+[   10.835866] input: meson-ir as /devices/platform/soc/c8100000.bus/c8100580.ir/rc/rc0/input0
+[   10.860552] rc rc0: sw decoder init
+[   10.861870] meson-ir c8100580.ir: receiver initialized
+[   10.897441] systemd[1]: Reached target usb-gadget.target - Hardware activated USB gadget.
+[   10.968336] Bluetooth: Core ver 2.22
+[   10.969850] NET: Registered PF_BLUETOOTH protocol family
+[   10.973002] Bluetooth: HCI device and connection manager initialized
+[   10.979281] Bluetooth: HCI socket layer initialized
+[   10.984171] Bluetooth: L2CAP socket layer initialized
+[   10.989140] Bluetooth: SCO socket layer initialized
+[   11.044232] videodev: Linux video capture interface: v2.00
+[   11.081244] systemd[1]: Listening on systemd-rfkill.socket - Load/Save RF Kill Switch Status /dev/rfkill Watch.
+[   11.127362] lima d00c0000.gpu: gp - mali450 version major 0 minor 0
+[   11.129762] lima d00c0000.gpu: pp0 - mali450 version major 0 minor 0
+[   11.136101] lima d00c0000.gpu: pp1 - mali450 version major 0 minor 0
+[   11.142568] lima d00c0000.gpu: pp2 - mali450 version major 0 minor 0
+[   11.148666] lima d00c0000.gpu: l2_cache0 8K, 4-way, 64byte cache line, 128bit external bus
+[   11.148686] lima d00c0000.gpu: l2_cache1 64K, 4-way, 64byte cache line, 128bit external bus
+[   11.149490] lima d00c0000.gpu: bus rate = 166666667
+[   11.149510] lima d00c0000.gpu: mod rate = 24000000
+[   11.149614] lima d00c0000.gpu: error -ENODEV: _opp_set_regulators: no regulator (mali) found
+[   11.154524] [drm] Initialized lima 1.1.0 for d00c0000.gpu on minor 1
+[   11.324820] Bluetooth: HCI UART driver ver 2.3
+[   11.324838] Bluetooth: HCI UART protocol H4 registered
+[   11.324842] Bluetooth: HCI UART protocol BCSP registered
+[   11.324956] Bluetooth: HCI UART protocol LL registered
+[   11.324963] Bluetooth: HCI UART protocol ATH3K registered
+[   11.325020] Bluetooth: HCI UART protocol Three-wire (H5) registered
+[   11.325244] Bluetooth: HCI UART protocol Intel registered
+[   11.325537] Bluetooth: HCI UART protocol Broadcom registered
+[   11.325600] Bluetooth: HCI UART protocol QCA registered
+[   11.325606] Bluetooth: HCI UART protocol AG6XX registered
+[   11.325643] Bluetooth: HCI UART protocol Marvell registered
+[   11.325730] hci_uart_bcm serial0-0: supply vbat not found, using dummy regulator
+[   11.325967] hci_uart_bcm serial0-0: supply vddio not found, using dummy regulator
+[   11.363001] meson_vdec: module is from the staging directory, the quality is unknown, you have been warned.
+[   11.505077] systemd[1]: Starting fake-hwclock-load.service - Restore the current clock...
+[   11.516337] systemd[1]: Starting modprobe@efi_pstore.service - Load Kernel Module efi_pstore...
+[   11.529379] systemd[1]: systemd-hibernate-clear.service - Clear Stale Hibernate Storage Info was skipped because of an unmet condition check (ConditionPathExists=/sys/firmware/efi/efivars/HibernateLocation-8cf2644b-4b0b-428f-9387-6d876050dc67).
+[   11.548076] systemd[1]: systemd-hwdb-update.service - Rebuild Hardware Database was skipped because no trigger condition checks were met.
+[   11.559848] systemd[1]: systemd-pcrmachine.service - TPM PCR Machine ID Measurement was skipped because of an unmet condition check (ConditionSecurity=measured-uki).
+[   11.575233] systemd[1]: systemd-tpm2-setup-early.service - Early TPM SRK Setup was skipped because of an unmet condition check (ConditionSecurity=measured-uki).
+[   11.588586] systemd[1]: systemd-tpm2-setup.service - TPM SRK Setup was skipped because of an unmet condition check (ConditionSecurity=measured-uki).
+[   11.606700] systemd[1]: Finished systemd-fsck@dev-disk-by\x2duuid-4EBD\x2d65A9.service - File System Check on /dev/disk/by-uuid/4EBD-65A9.
+[   11.620461] systemd[1]: fake-hwclock-load.service: Deactivated successfully.
+[   11.628212] systemd[1]: Finished fake-hwclock-load.service - Restore the current clock.
+[   11.634876] systemd[1]: modprobe@efi_pstore.service: Deactivated successfully.
+[   11.640074] systemd[1]: Finished modprobe@efi_pstore.service - Load Kernel Module efi_pstore.
+[   11.681054] systemd[1]: Reached target bluetooth.target - Bluetooth Support.
+[   11.692153] systemd[1]: Mounting boot.mount - /boot...
+[   11.695292] systemd[1]: systemd-fsck-root.service - File System Check on Root Device was skipped because of an unmet condition check (ConditionPathExists=!/run/initramfs/fsck-root).
+[   11.709473] systemd[1]: systemd-pstore.service - Platform Persistent Storage Archival was skipped because of an unmet condition check (ConditionDirectoryNotEmpty=/sys/fs/pstore).
+[   11.736071] systemd[1]: Starting systemd-rfkill.service - Load/Save RF Kill Switch Status...
+[   11.780898] systemd[1]: Mounted boot.mount - /boot.
+[   11.785468] systemd[1]: Reached target local-fs.target - Local File Systems.
+[   11.797816] systemd[1]: Listening on systemd-sysext.socket - System Extension Image Management.
+[   11.808418] systemd[1]: Starting armbian-zram-config.service - Armbian ZRAM config...
+[   11.818488] systemd[1]: Starting console-setup.service - Set console font and keymap...
+[   11.833083] systemd[1]: Starting systemd-binfmt.service - Set Up Additional Binary Formats...
+[   11.839724] systemd[1]: systemd-machine-id-commit.service - Save Transient machine-id to Disk was skipped because of an unmet condition check (ConditionPathIsMountPoint=/etc/machine-id).
+[   11.856040] systemd[1]: Started systemd-rfkill.service - Load/Save RF Kill Switch Status.
+[   11.910575] systemd[1]: proc-sys-fs-binfmt_misc.automount: Got automount request for /proc/sys/fs/binfmt_misc, triggered by 1263 (systemd-binfmt)
+[   11.925402] systemd[1]: Mounting proc-sys-fs-binfmt_misc.mount - Arbitrary Executable File Formats File System...
+[   11.998625] systemd[1]: Mounted proc-sys-fs-binfmt_misc.mount - Arbitrary Executable File Formats File System.
+[   12.013012] systemd[1]: Finished systemd-binfmt.service - Set Up Additional Binary Formats.
+[   12.105164] meson8b-dwmac c9410000.ethernet eth0: Link is Up - 100Mbps/Full - flow control rx/tx
+[   12.278644] zram: Added device: zram0
+[   12.281110] zram: Added device: zram1
+[   12.284641] zram: Added device: zram2
+[   12.405346] zram0: detected capacity change from 0 to 1961376
+[   12.444162] Adding 980684k swap on /dev/zram0.  Priority:5 extents:1 across:980684k SS
+[   12.514808] zram1: detected capacity change from 0 to 102400
+[   12.616884] systemd[1]: Finished armbian-zram-config.service - Armbian ZRAM config.
+[   12.638684] systemd[1]: Starting armbian-ramlog.service - Armbian memory supported logging...
+[   12.806156] EXT4-fs (zram1): mounted filesystem ebc28370-ecb5-4a0e-8710-1662d8347e6f r/w without journal. Quota mode: none.
+[   13.236643] systemd[1]: Finished armbian-ramlog.service - Armbian memory supported logging.
+[   13.253804] systemd[1]: Starting systemd-journald.service - Journal Service...
+[   13.401442] systemd-journald[1371]: Collecting audit messages is disabled.
+[   13.558914] systemd[1]: Started systemd-journald.service - Journal Service.
+[   13.599660] Bluetooth: hci0: command 0xfc18 tx timeout
+[   13.601115] Bluetooth: hci0: BCM: failed to write update baudrate (-110)
+[   13.607266] Bluetooth: hci0: Failed to set baudrate
+[   13.681985] systemd-journald[1371]: Received client request to flush runtime journal.
+[   15.647643] Bluetooth: hci0: command 0xfc18 tx timeout
+[   15.648801] Bluetooth: hci0: BCM: Reset failed (-110)
+[   16.733951] EXT4-fs (mmcblk1p2): resizing filesystem from 428032 to 7580672 blocks
+[   16.916693] NOTICE: Automounting of tracing to debugfs is deprecated and will be removed in 2030
+[   17.343505] EXT4-fs (mmcblk1p2): resized filesystem to 7580672
+[   19.101181] systemd-journald[1371]: Received client request to relinquish /var/log/journal/2533523ecdbb44ce8384494a9432dcb1 access.
+[!p]104[?7h[6n[32766;32766H[6n[!p]104[?7h[6n[32766;32766H[6n
+
+aml-s9xx-box login: root (automatic login)
+
+
+[38;1R[38;114R[38;114R[38;114R
+Waiting for system to finish booting ...
+[H[J[3JWelcome to [1m[97mArmbian_community[0m! 
+
+Documentation: [1m[92mhttps://docs.armbian.com[0m | Community support: [1m[92mhttps://community.armbian.com/[0m
+
+
+[1A[KIP address: [92m192.168.123.2[0m 
+
