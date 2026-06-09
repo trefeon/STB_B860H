@@ -1,71 +1,71 @@
-# ZTE B860H Armbian SD Card Boot Guide (Bootloop Fix)
+# Panduan Boot SD Card Armbian ZTE B860H (Solusi Bootloop)
 
-This repository provides a reliable method to boot **Armbian Linux** on the **ZTE B860H V1/V2 (Amlogic S905X - Board p212)** via an SD card. 
+Repositori ini menyediakan metode yang andal untuk mem-boot **Armbian Linux** pada **ZTE B860H V1/V2 (Amlogic S905X - Board p212)** melalui SD card (kartu SD). 
 
-This specific guide is designed to bypass the common **"saveenv" bootloop** that occurs when the internal eMMC of the STB is corrupted, locked, or unwritable.
+Panduan spesifik ini dirancang untuk mem-bypass (melewati) masalah umum **bootloop "saveenv"** yang terjadi ketika eMMC internal STB (Set-Top Box) mengalami kerusakan, terkunci, atau tidak dapat ditulisi.
 
-## 🌟 Why this method?
+## 🌟 Mengapa menggunakan metode ini?
 
-Standard Armbian `aml_autoscript` files attempt to write boot variables to the device's internal storage (`saveenv`). If your eMMC is damaged, this process fails, and the STB loops infinitely into recovery or the boot logo.
+File `aml_autoscript` standar dari Armbian mencoba menulis variabel boot ke penyimpanan internal perangkat (`saveenv`). Jika eMMC Anda rusak, proses ini akan gagal, dan STB akan mengalami bootloop (mengulang terus-menerus) masuk ke mode recovery atau hanya mentok di logo boot.
 
-By using the scripts provided in this repository, we instruct the STB to **directly chainload** the secondary bootloader (`u-boot.ext`) off the SD card, completely bypassing any writes to the internal memory.
+Dengan menggunakan skrip yang disediakan di repositori ini, kita menginstruksikan STB untuk **langsung melakukan chainload** bootloader sekunder (`u-boot.ext`) dari kartu SD, sepenuhnya melewati segala proses penulisan ke memori internal.
 
 ---
 
-## 🚀 Installation Guide
+## 🚀 Panduan Instalasi
 
-### 1. Flash the SD Card
-1. Get a reliable MicroSD Card (minimum 8GB, Class 10).
-2. Download the [Armbian Imager](https://github.com/armbian/imager) (Highly Recommended) or use Balena Etcher.
-3. Select an Ophub Armbian image for `Amlogic S9xxx` (either `.img.xz` or `.img.gz`).
-4. Flash the image to your SD card and wait for completion.
+### 1. Flash Kartu SD
+1. Siapkan Kartu MicroSD yang andal (minimal 8GB, Class 10).
+2. Unduh [Armbian Imager](https://github.com/armbian/imager) (Sangat Disarankan) atau gunakan Balena Etcher.
+3. Pilih image Armbian Ophub untuk `Amlogic S9xxx` (berformat `.img.xz` atau `.img.gz`).
+4. Flash image tersebut ke kartu SD Anda dan tunggu hingga selesai.
 
-### 2. Configure the BOOT Partition
-Once flashing is done, re-insert your SD card so the `BOOT` partition mounts on your PC. You need to make three critical changes:
+### 2. Konfigurasi Partisi BOOT
+Setelah proses flashing selesai, cabut dan pasang kembali kartu SD Anda agar partisi `BOOT` terbaca di PC. Anda perlu melakukan tiga perubahan penting:
 
-#### A. Activate the Secondary Bootloader
-The B860H's default bootloader needs an extension.
-1. Open the `BOOT` partition.
-2. Find the file named `u-boot-s905x-s912`.
-3. **Rename** it exactly to `u-boot.ext`.
+#### A. Aktifkan Bootloader Sekunder
+Bootloader bawaan B860H memerlukan ekstensi.
+1. Buka partisi `BOOT`.
+2. Cari file bernama `u-boot-s905x-s912`.
+3. **Ubah nama (Rename)** file tersebut persis menjadi `u-boot.ext`.
 
-#### B. Set the Device Tree (DTB)
-Tell Armbian which hardware it's running on:
-1. Open `uEnv.txt` (or `extlinux/extlinux.conf` depending on the image).
-2. Locate the `FDT` line.
-3. Change it to point to the p212 device tree:
+#### B. Atur Device Tree (DTB)
+Beritahu Armbian perangkat keras apa yang sedang digunakannya:
+1. Buka file `uEnv.txt` (atau `extlinux/extlinux.conf` tergantung pada image yang digunakan).
+2. Cari baris `FDT`.
+3. Ubah nilainya agar mengarah ke device tree p212:
    ```ini
    FDT=/dtb/amlogic/meson-gxl-s905x-p212.dtb
    ```
-4. Save the file.
+4. Simpan file tersebut.
 
-#### C. Apply the Bootloop Bypass (Crucial Step)
-If you have eMMC issues, do this to prevent bootloops:
-1. In the `BOOT` partition, find `s905_autoscript`.
-2. Delete (or rename) the existing `aml_autoscript`.
-3. **Copy** `s905_autoscript` and **Rename** the copy to `aml_autoscript`.
+#### C. Terapkan Bypass Bootloop (Langkah Krusial)
+Jika Anda mengalami masalah eMMC, lakukan ini untuk mencegah bootloop:
+1. Di partisi `BOOT`, cari file `s905_autoscript`.
+2. Hapus (atau ubah nama) file `aml_autoscript` yang sudah ada.
+3. **Salin (Copy)** `s905_autoscript` dan **Ubah Nama (Rename)** hasil salinannya menjadi `aml_autoscript`.
 
-*(Alternatively, you can just download the pre-compiled `aml_autoscript` from the `boot-scripts/` folder in this repository and overwrite the one on your SD card).*
+*(Sebagai alternatif, Anda dapat mengunduh `aml_autoscript` yang sudah dikompilasi dari folder `boot-scripts/` di repositori ini dan menimpanya ke kartu SD Anda).*
 
-### 3. Booting the STB
-1. Ensure the STB is powered off.
-2. Insert the prepared SD Card.
-3. Plug in the power cable.
-4. The device will automatically read the `aml_autoscript` from the SD card and boot directly into Armbian Linux!
-
----
-
-## 🛠️ Repository Contents
-
-*   `boot-scripts/`: Contains the compiled boot bypass scripts (`aml_autoscript` and `s905_autoscript`).
-*   `src/`: Contains the original human-readable Ophub script texts and a python compiler (`make_aml_autoscript.py`) if you wish to build the scripts yourself using `mkimage`.
-*   `logs/`: Contains reference UART boot logs demonstrating successful bypass of the `saveenv` failure.
+### 3. Mem-boot STB
+1. Pastikan STB dalam keadaan mati (tidak tersambung listrik).
+2. Masukkan Kartu SD yang telah disiapkan.
+3. Colokkan kabel daya (power).
+4. Perangkat akan secara otomatis membaca `aml_autoscript` dari kartu SD dan langsung mem-boot Armbian Linux!
 
 ---
 
-## 📝 First Login
-Once the system boots and connects to your network:
+## 🛠️ Isi Repositori
+
+*   `boot-scripts/`: Berisi skrip bypass boot yang sudah dikompilasi (`aml_autoscript` dan `s905_autoscript`).
+*   `src/`: Berisi teks skrip Ophub asli yang dapat dibaca manusia dan kompilator python (`make_aml_autoscript.py`) jika Anda ingin membuat skrip sendiri menggunakan `mkimage`.
+*   `logs/`: Berisi referensi log boot UART yang mendemonstrasikan keberhasilan bypass dari kegagalan `saveenv`.
+
+---
+
+## 📝 Login Pertama
+Setelah sistem berhasil boot dan terhubung ke jaringan Anda:
 *   **Username:** `root`
-*   **Default Password:** `1234`
+*   **Password Default:** `1234`
 
-You will be prompted to change the password immediately upon your first login.
+Anda akan diminta untuk segera mengubah password pada saat pertama kali login.
