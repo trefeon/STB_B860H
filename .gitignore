@@ -1,0 +1,11 @@
+# Ignore firmware and tools folders
+Amlogic_Flash_Tool_v3.1.0/
+Amlogic_USB_Burning_Tool_v2.2.4/
+BootcardMaker dari pulpstone v3.2/
+Pulpstone B860H v2.0/
+Pulpstone_Android_ZTE_B860H_v2.0_FINAL/
+Pulpstone_Android_v3.8_B860H/
+
+# OS generated files
+.DS_Store
+Thumbs.db
