@@ -1,6 +1,8 @@
 #!/bin/bash
-cd /d/STB_B860H
-UBOOT="[Tertechan] ZTE B860H V1-V2 no eMMC/Bahan/uboot_HG680P.bin"
+# Resolve script's directory and move to repo root
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$DIR/.."
+UBOOT="boot/uboot_HG680P.bin"
 IMG="Armbian_patched.img"
 
 echo "=== U-boot: $UBOOT ==="

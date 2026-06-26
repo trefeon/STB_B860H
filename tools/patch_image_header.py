@@ -26,7 +26,7 @@ def patch_kernel_header(filepath, new_offset):
         print(f"ERROR: Invalid Magic 0x{magic:08x} (expected 0x644d5241 / 'ARM\\x64')")
         return False
         
-    print(f"Current Header values:")
+    print("Current Header values:")
     print(f"  Magic:       0x{magic:08x} (ARM64)")
     print(f"  Text Offset: 0x{text_offset:x}")
     print(f"  Image Size:  0x{image_size:x} ({image_size} bytes)")
@@ -68,7 +68,7 @@ def patch_kernel_header(filepath, new_offset):
         
     p_code0, p_code1, p_text_offset, p_image_size, p_flags, p_res2, p_res3, p_res4, p_magic, p_res5 = struct.unpack('<IIQQQQQQII', patched_header)
     
-    print(f"Verifying Patched Header values:")
+    print("Verifying Patched Header values:")
     print(f"  Magic:       0x{p_magic:08x}")
     print(f"  Text Offset: 0x{p_text_offset:x}")
     print(f"  Image Size:  0x{p_image_size:x} ({p_image_size} bytes)")
@@ -81,4 +81,10 @@ def patch_kernel_header(filepath, new_offset):
         return False
 
 if __name__ == "__main__":
-    patch_kernel_header(TARGET_FILE, TARGET_OFFSET)
+    import argparse
+    parser = argparse.ArgumentParser(description="Patch ARM64 kernel Image text_offset to bypass Secure Monitor / TrustZone crash.")
+    parser.add_argument("image_path", nargs="?", default=TARGET_FILE, help="Path to the kernel 'Image' file (default: f:\\Image)")
+    parser.add_argument("--offset", type=lambda x: int(x, 0), default=TARGET_OFFSET, help="New text_offset value (default: 0x1080000 / 16.5 MB)")
+    
+    args = parser.parse_args()
+    patch_kernel_header(args.image_path, args.offset)

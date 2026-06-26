@@ -10,16 +10,27 @@ This writes u-boot while preserving the MBR partition table (bytes 442-511).
 import sys
 import os
 import lzma
-import shutil
 
-UBOOT = r"d:\STB_B860H\[Tertechan] ZTE B860H V1-V2 no eMMC\Bahan\uboot_HG680P.bin"
-IMG_XZ = r"d:\STB_B860H\Armbian_community_26.8.0-trunk.170_Aml-s9xx-box_trixie_current_6.18.35_minimal.img.xz"
-IMG_OUT = r"d:\STB_B860H\Armbian_patched.img"
+import glob
+
+# Resolve paths relative to the repository root (one level up from this script's directory)
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+UBOOT = os.path.join(REPO_ROOT, "boot", "uboot_HG680P.bin")
+
+# Dynamically find the .img.xz file in the repository root
+xz_files = glob.glob(os.path.join(REPO_ROOT, "*.img.xz"))
+if xz_files:
+    IMG_XZ = xz_files[0]
+else:
+    IMG_XZ = os.path.join(REPO_ROOT, "Armbian_image.img.xz")
+
+IMG_OUT = os.path.join(REPO_ROOT, "Armbian_patched.img")
+
 
 def decompress_xz(src, dst):
     """Decompress .img.xz to .img"""
     print(f"[1/3] Decompressing {os.path.basename(src)}...")
-    print(f"      This may take a few minutes...")
+    print("      This may take a few minutes...")
     
     with lzma.open(src, 'rb') as f_in:
         with open(dst, 'wb') as f_out:
@@ -44,7 +55,7 @@ def patch_uboot(img_path, uboot_path):
         # Write first 442 bytes (before MBR partition table)
         img.seek(0)
         img.write(uboot_data[:442])
-        print(f"      Written bytes 0-441 (bootstrap code)")
+        print("      Written bytes 0-441 (bootstrap code)")
         
         # Command 2: dd if=uboot.bin of=img bs=512 skip=1 seek=1
         # Write from byte 512 onward (after MBR)
@@ -56,14 +67,14 @@ def patch_uboot(img_path, uboot_path):
         img.seek(510)
         sig = img.read(2)
         if sig == b'\x55\xaa':
-            print(f"      MBR signature: 55 AA ✓")
+            print("      MBR signature: 55 AA ✓")
         else:
             print(f"      WARNING: MBR signature: {sig.hex()} (expected 55aa)")
         
         img.flush()
         os.fsync(img.fileno())
     
-    print(f"      U-boot patched successfully!")
+    print("      U-boot patched successfully!")
 
 def main():
     print("=" * 60)
@@ -99,7 +110,7 @@ def main():
     
     # Step 3: Done
     print()
-    print(f"[3/3] DONE! Flash this to SD card:")
+    print("[3/3] DONE! Flash this to SD card:")
     print(f"      {IMG_OUT}")
     print()
     print("  Use balenaEtcher, Rufus, or Win32DiskImager to flash.")

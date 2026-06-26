@@ -33,15 +33,15 @@ Kami menyediakan skrip otomatis untuk melakukan hal ini:
 * **Pengguna Windows:** Jalankan skrip Python:
 
   ```bash
-  python patch_uboot.py
+  python tools/patch_uboot.py
   ```
 
-  *(Skrip ini akan mengambil file `uboot_HG680P.bin` di folder Bahan dan menulis bagian bootstrap ke bytes 0-441 serta body U-Boot mulai byte 512 ke kartu SD Anda).*
+  *(Skrip ini akan mengambil file `uboot_HG680P.bin` di folder `boot/` dan menulis bagian bootstrap ke bytes 0-441 serta body U-Boot mulai byte 512 ke kartu SD Anda).*
 
 * **Pengguna Linux / Git Bash:** Jalankan shell script:
 
   ```bash
-  ./do_dd.sh
+  ./tools/do_dd.sh
   ```
 
 ---
@@ -52,7 +52,7 @@ Setelah menulis U-Boot ke sektor raw, cabut dan pasang kembali kartu SD di kompu
 
 ### 3A. Menyalin File Boot Wajib
 
-1. Salin file `aml_autoscript` dari folder `[Tertechan] ZTE B860H V1-V2 no eMMC/Bahan/Copy ke BOOT/` ke root partisi `BOOT` kartu SD Anda.
+1. Salin file `aml_autoscript` dari folder `boot/` ke root partisi `BOOT` kartu SD Anda.
 2. Buat file bernama **`uEnv.txt`** di root partisi `BOOT` kartu SD dengan konfigurasi berikut:
 
    ```ini
@@ -68,10 +68,10 @@ Setelah menulis U-Boot ke sektor raw, cabut dan pasang kembali kartu SD di kompu
 * **Solusi:** Jalankan skrip Python pembantu untuk mem-patch nilai `text_offset` di dalam file `Image` menjadi `0x1080000` (16.5 MB):
 
   ```bash
-  python patch_image_header.py
+  python tools/patch_image_header.py
   ```
 
-  *(Skrip akan otomatis membuat backup `Image.bak` dan menulis bytes `00 00 08 01 00 00 00 00` ke offset byte 8 dari file `Image` di kartu SD Anda).*
+  *(Skrip akan otomatis membuat backup `Image.bak` dan menulis bytes `00 00 08 01 00 00 00 00` ke offset byte 8 dari file `Image` di kartu SD Anda. Anda juga bisa menyertakan path/drive letter kustom sebagai argumen, contoh: `python tools/patch_image_header.py g:\Image`).*
 
 ---
 
@@ -84,10 +84,10 @@ Untuk memperbaikinya tanpa merusak kompatibilitas kernel mainline:
 1. Jalankan skrip Python:
 
    ```bash
-   python patch_dtb.py
+   python tools/patch_dtb.py
    ```
 
-   *(Skrip ini akan mem-patch file `dtb/amlogic/meson-gxl-s905x-p212.dtb` di kartu SD secara in-place pada offset file `28280`, mengubah nilai reset pin dari `85` (`0x55`) menjadi `76` (`0x4c`)).*
+   *(Skrip ini akan mem-patch file `dtb/amlogic/meson-gxl-s905x-p212.dtb` di kartu SD secara in-place pada offset file `28280`, mengubah nilai reset pin dari `85` (`0x55`) menjadi `76` (`0x4c`). Anda juga bisa menyertakan path file DTB kustom sebagai argumen, contoh: `python tools/patch_dtb.py g:\dtb\amlogic\meson-gxl-s905x-p212.dtb`).*
 
 2. Kernel modern sekarang dapat melakukan power-on pada chip Wi-Fi secara otomatis dan memuat driver yang tepat (`brcmfmac` / `rtl8723bs`).
 
@@ -123,3 +123,13 @@ Jika pemindaian (scanning) Wi-Fi macet (hang) atau tidak memunculkan daftar kone
 2. Masuk ke **Network** -> **Advanced Network Configuration**.
 3. Pilih opsi untuk mengembalikan pengaturan jaringan ke **Armbian defaults** (revert to Armbian default).
 4. Restart layanan jaringan atau restart STB Anda. Proses scanning dan koneksi Wi-Fi akan berjalan lancar!
+
+---
+
+## 📂 Struktur Repositori
+
+Repositori ini diatur dengan struktur yang bersih sebagai berikut:
+
+* **[`boot/`](file:///D:/STB_B860H/boot/)**: Berisi file U-Boot primer (`uboot_B860H.bin`, `uboot_HG680P.bin`), skrip boot bypass (`aml_autoscript`, `aml_autoscript.cmd`), berkas DTB dasar (`meson-gxl-s905x-p212.dtb`), dan file flash lama (`legacy/`).
+* **[`tools/`](file:///D:/STB_B860H/tools/)**: Berisi skrip otomatisasi untuk patching U-Boot, kernel, dan DTB, serta sub-folder `diagnostics/` dan `optimizations/` untuk skrip pemantauan dan optimasi sistem.
+* **[`docs/`](file:///D:/STB_B860H/docs/)**: Berisi dokumen referensi lanjut, panduan pemulihan sistem, panduan build Armbian, dan aset gambar.

@@ -10,11 +10,13 @@ Pulpstone_Android_v3.8_B860H/
 .DS_Store
 Thumbs.db
 
-# Large binaries and logs
+# Large binaries, backups, and logs
 *.img
 *.img.xz
 *.img.gz
 *.exe
 *.zip
 *.log
+*.bak
+
 
