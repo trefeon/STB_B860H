@@ -18,5 +18,8 @@ Thumbs.db
 *.zip
 *.log
 *.bak
+__pycache__/
+*.pyc
+
 
 
