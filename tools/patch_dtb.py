@@ -1,10 +1,54 @@
 import os
 import shutil
+import struct
 
 TARGET_DTB = r"f:\dtb\amlogic\meson-gxl-s905x-p212.dtb"
-OFFSET = 28280  # From find_gpio_offset.py
 OLD_VAL = b'\x00\x00\x00\x15\x00\x00\x00\x55\x00\x00\x00\x01'
 NEW_VAL = b'\x00\x00\x00\x15\x00\x00\x00\x4c\x00\x00\x00\x01'
+
+def find_reset_gpios_offset(filepath):
+    try:
+        with open(filepath, 'rb') as f:
+            data = f.read()
+        if len(data) < 40:
+            return None
+        magic, totalsize, off_dt_struct, off_dt_strings, off_mem_rsvmap, version, last_comp_version, boot_cpuid_phys, size_dt_strings, size_dt_struct = struct.unpack('>IIIIIIIIII', data[:40])
+        strings_data = data[off_dt_strings:off_dt_strings+size_dt_strings]
+        struct_data = data[off_dt_struct:off_dt_struct+size_dt_struct]
+        
+        idx = 0
+        node_stack = []
+        while idx < len(struct_data):
+            token = struct.unpack('>I', struct_data[idx:idx+4])[0]
+            idx += 4
+            if token == 1: # FDT_BEGIN_NODE
+                name_bytes = []
+                while struct_data[idx] != 0:
+                    name_bytes.append(struct_data[idx])
+                    idx += 1
+                idx += 1
+                idx = (idx + 3) & ~3
+                node_name = bytes(name_bytes).decode('ascii', errors='ignore')
+                node_stack.append(node_name)
+            elif token == 2: # FDT_END_NODE
+                if node_stack:
+                    node_stack.pop()
+            elif token == 3: # FDT_PROP
+                val_len, name_off = struct.unpack('>II', struct_data[idx:idx+8])
+                p_end = strings_data.find(b'\x00', name_off)
+                prop_name = strings_data[name_off:p_end].decode('ascii', errors='ignore')
+                current_path = "/" + "/".join(node_stack)
+                if current_path == "//sdio-pwrseq" and prop_name == "reset-gpios":
+                    return off_dt_struct + idx + 8
+                idx += 8 + val_len
+                idx = (idx + 3) & ~3
+            elif token == 4: # FDT_NOP
+                pass
+            elif token == 9: # FDT_END
+                break
+    except Exception as e:
+        print(f"Error parsing DTB: {e}")
+    return None
 
 def patch_dtb(filepath=TARGET_DTB):
     if not os.path.exists(filepath):
@@ -13,17 +57,25 @@ def patch_dtb(filepath=TARGET_DTB):
         
     print(f"Target DTB: {filepath}")
     
+    offset = find_reset_gpios_offset(filepath)
+    if offset is None:
+        print("ERROR: Could not dynamically locate reset-gpios offset in DTB.")
+        return False
+        
+    print(f"Found reset-gpios offset dynamically at: {offset} (0x{offset:x})")
+    
     # Read to verify bytes at offset
     with open(filepath, 'rb') as f:
-        f.seek(OFFSET)
+        f.seek(offset)
         current_bytes = f.read(12)
+
         
     if current_bytes == NEW_VAL:
         print("DTB is already patched with the correct reset-gpios value.")
         return True
         
     if current_bytes != OLD_VAL:
-        print(f"ERROR: Bytes at offset {OFFSET} do not match expected original value.")
+        print(f"ERROR: Bytes at offset {offset} do not match expected original value.")
         print(f"Expected: {OLD_VAL.hex()}")
         print(f"Found:    {current_bytes.hex()}")
         return False
@@ -45,7 +97,7 @@ def patch_dtb(filepath=TARGET_DTB):
     print("Patching reset-gpios pin from 85 (0x55) to 76 (0x4c)...")
     try:
         with open(filepath, 'r+b') as f:
-            f.seek(OFFSET)
+            f.seek(offset)
             f.write(NEW_VAL)
             f.flush()
             os.fsync(f.fileno())
@@ -56,7 +108,7 @@ def patch_dtb(filepath=TARGET_DTB):
         
     # Verify patch
     with open(filepath, 'rb') as f:
-        f.seek(OFFSET)
+        f.seek(offset)
         verified_bytes = f.read(12)
         
     if verified_bytes == NEW_VAL:

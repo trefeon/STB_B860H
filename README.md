@@ -1,4 +1,81 @@
-# Panduan Lengkap: Bypass eMMC Mati & Booting Armbian Langsung dari SD Card di ZTE B860H V1/V2
+# Toolkit & Panduan Instalasi Armbian ZTE ZXV10 B860H V1/V2 (Amlogic S905X)
+
+Repositori ini berisi panduan teknis, investigasi, skrip otomatisasi, dan perangkat diagnostik untuk menjalankan **Armbian Linux** pada STB **ZTE ZXV10 B860H** untuk dua skenario utama:
+
+1. **Perangkat Sehat / Fresh eMMC**: Panduan instalasi Armbian modern (**Debian 12 Bookworm / Linux Kernel 6.12.y LTS**), pembersihan firmware eksploit marketplace (PPPwn), migrasi penuh ke internal eMMC, setup Swap Virtual Memory, dan pemanfaatan kartu MicroSD sebagai internal storage permanen (30 GB).
+   👉 **[Baca Panduan Lengkap Modern Armbian 6.x (eMMC & MicroSD)](docs/MODERN_ARMBIAN_6X_INSTALL_GUIDE.md)**
+
+2. **Perangkat Rusak eMMC (Dead/Corrupted Hardware eMMC)**: Panduan bypass bootloader internal eMMC dengan menyuntikkan U-Boot langsung ke sektor raw kartu MicroSD, kernel relocation patching, dan DTB patching.
+   👉 **[Baca Panduan Pemulihan eMMC Mati (Legacy Bypass)](docs/PERMANENT_SD_BOOT_GUIDE.md)**
+
+---
+
+## 🚀 Quick Start: Modern Armbian 6.12 LTS di eMMC & SD Storage
+
+Bagi Anda yang memiliki STB B860H dengan eMMC sehat (termasuk bekas STB PPPwn / Android TV):
+
+1. **Download Image Resmi**:
+   ```bash
+   python tools/download_and_prep_image.py
+   ```
+   *(Mengunduh `Armbian_26.11.0_amlogic_s905x-b860h_bookworm_6.12.112_server` dan mengekstrak ke `D:/Armbian_b860h.img`)*.
+
+2. **Flash ke MicroSD**:
+   Jalankan `tools/run_flash.bat` (Run as Administrator) atau gunakan BalenaEtcher/Rufus.
+
+3. **Konfigurasi `uEnv.txt` di Partisi `BOOT` (Penting)**:
+   Pastikan baris `APPEND` menyertakan `rootdelay=10` dan `root=LABEL=ROOTFS`:
+   ```ini
+   FDT=/dtb/amlogic/meson-gxl-s905x-b860h.dtb
+   APPEND=root=LABEL=ROOTFS rootdelay=10 rootflags=data=writeback rw rootwait rootfstype=ext4 console=ttyAML0,115200n8 console=tty0 no_console_suspend consoleblank=0 fsck.fix=yes fsck.repair=yes net.ifnames=0 max_loop=128 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory swapaccount=1 video=HDMI-A-1:1920x1080@60e plymouth.enable=0
+   ```
+
+4. **Booting MicroSD & Migrasi ke eMMC**:
+   - Colok MicroSD ke STB dan nyalakan. Login SSH (`root` / `1234`).
+   - Jalankan `sudo armbian-install` $\to$ Masukkan ID `106` (B860H) $\to$ Pilih `1` (ext4).
+
+5. **Setup Swap & Repurpose MicroSD sebagai Storage**:
+   - Matikan STB (`poweroff`), cabut MicroSD, nyalakan kembali STB (STB boot dari eMMC internal).
+   - Colok kembali MicroSD, lalu jalankan:
+     ```bash
+     sudo /root/setup_sd_storage.sh
+     ```
+   - MicroSD otomatis terformat menjadi `ext4` murni (label `SD_STORAGE`) dan termounting di `/mnt/storage` serta `/home/<user>/storage`.
+
+6. **Cek Kesehatan Sistem via Native SSH & Bash**:
+   ```bash
+   # Jalankan skrip diagnostik (otomatis via SSH tanpa password)
+   bash tools/diagnostics/ssh_check.sh
+
+   # Atau akses remote langsung via shortcut Windows:
+   ssh stb       # Akses via LAN Kabel (<STB-LAN-IP>)
+   ssh stb-wifi  # Akses via Wi-Fi Backup (<STB-WIFI-IP>)
+   ssh stb-ts    # Akses via Tailscale VPN (<TAILSCALE-IP>)
+   ```
+
+7. **Paket Auto-Patch Offline Wi-Fi & DTB Turnkey**:
+   Untuk STB baru, jalankan satu perintah dari PC/laptop Anda tanpa perlu compile di STB:
+   ```bash
+   bash tools/ship_patch.sh stb
+   ```
+   *(Otomatis memasang driver Wi-Fi `8189fs.ko` dan DTB `meson-gxl-s905x-b860h.dtb` dalam < 2 detik tanpa internet)*.
+
+8. **Hardware UART Pinout & Cold Boot Recovery**:
+   Jika mengalami kendala bootloader / cold boot hang, hubungkan adapter USB TTL ke header `X2` PCB B860H:
+   - **Gnd** $\to$ `GND`
+   - **Tx** $\to$ `RXD`
+   - **Rx** $\to$ `TXD`
+   - Jalankan `python tools/diagnostics/serial_monitor.py` (Baudrate: `115200`).
+   - Panduan lengkap: 👉 **[Baca Bab 11 Troubleshooting eMMC & Cold Boot](docs/MODERN_ARMBIAN_6X_INSTALL_GUIDE.md#11-troubleshooting--playbook-emmc-cold-boot--microsd-storage)**
+---
+
+## 🛠️ Panduan Bypass eMMC Mati (Legacy Hardware Bypass)
+
+*(Bagian berikut untuk unit B860H yang hardware eMMC internalnya rusak total/dead eMMC).*
+
+---
+
+### Ringkasan Proses Bypass
 
 Repositori ini berisi dokumentasi, skrip otomatisasi, dan panduan langkah demi langkah untuk menginstal dan menjalankan **Armbian Linux** (Kernel Mainline 6.x) pada STB **ZTE ZXV10 B860H V1/V2** yang mengalami **kerusakan hardware eMMC internal total (dead eMMC)**.
 
@@ -130,6 +207,10 @@ Jika pemindaian (scanning) Wi-Fi macet (hang) atau tidak memunculkan daftar kone
 
 Repositori ini diatur dengan struktur yang bersih sebagai berikut:
 
-* **[`boot/`](file:///D:/STB_B860H/boot/)**: Berisi file U-Boot primer (`uboot_B860H.bin`, `uboot_HG680P.bin`), skrip boot bypass (`aml_autoscript`, `aml_autoscript.cmd`), berkas DTB dasar (`meson-gxl-s905x-p212.dtb`), dan file flash lama (`legacy/`).
-* **[`tools/`](file:///D:/STB_B860H/tools/)**: Berisi skrip otomatisasi untuk patching U-Boot, kernel, dan DTB, serta sub-folder `diagnostics/` dan `optimizations/` untuk skrip pemantauan dan optimasi sistem.
-* **[`docs/`](file:///D:/STB_B860H/docs/)**: Berisi dokumen referensi lanjut, panduan pemulihan sistem, panduan build Armbian, dan aset gambar.
+* **[`boot/`](boot/)**: Berisi file U-Boot primer (`uboot_B860H.bin`, `uboot_HG680P.bin`), skrip boot bypass (`aml_autoscript`), dan Device Tree resmi B860H Kernel 6.x (`meson-gxl-s905x-b860h.dtb`).
+* **[`tools/`](tools/)**: Berisi skrip otomatisasi:
+  * `auto_patch_wifi_bt.sh`: Kompilasi otomatis out-of-tree driver Realtek RTL8189FS & pembersihan phantom Bluetooth DTB pada Kernel 6.x.
+  * `diagnostics/*.sh`: Skrip audit kesehatan, optimasi, RF/Bluetooth, dan reboot STB berbasis native `ssh`.
+  * `optimizations/*.sh`: Skrip otomatisasi tuning kernel sysctl, TCP BBR, zram, CPU governor, dan batas journald.
+  * `download_and_prep_image.py`, `flash_sd.py`, `run_flash.bat`: Tool download image Ophub & flashing raw disk Windows.
+* **[`docs/`](docs/)**: Panduan instalasi modern eMMC & MicroSD, riset hardware, dan panduan recovery SD.

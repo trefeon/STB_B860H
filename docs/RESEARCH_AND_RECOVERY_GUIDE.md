@@ -181,3 +181,31 @@ Run the following helper scripts to patch the files directly on the mounted SD c
    * Run `sudo armbian-config`.
    * Go to **Network** -> **Advanced Network Configuration** -> **Revert to defaults**.
    * Restart network services: `sudo systemctl restart NetworkManager`.
+
+---
+
+## 7. Hardware Serial Console (UART TTL Pinout)
+
+For low-level hardware debugging and reading real-time BootROM/U-Boot serial output:
+
+![ZTE B860H UART Pinout](assets/b860h_uart_pinout.png)
+
+### Header Specification:
+- **Header Label on PCB**: `X2` (located directly adjacent to the motherboard mounting screw hole).
+- **Layout**: 2×3 (6-pad) header.
+
+| Pin Location | Label on Board | Connect to USB-TTL | Description |
+| :---: | :---: | :---: | :--- |
+| **Top Row** | **Gnd** | **GND** | Signal Ground reference |
+| **Bottom Left** | **Tx** | **RXD** | Transmit from STB $\to$ Receive on USB TTL adapter |
+| **Bottom Right** | **Rx** | **TXD** | Receive into STB $\to$ Transmit from USB TTL adapter |
+
+> **Safety Rule**: Never connect the VCC (3.3V/5V) pin! The STB is self-powered via its 12V DC barrel jack. Connecting external VCC can cause back-feed damage to the USB TTL adapter or host PC.
+
+### Serial Terminal Settings:
+- **Baud Rate**: `115200`
+- **Data Bits**: `8`
+- **Parity**: `None`
+- **Stop Bits**: `1`
+- **Flow Control**: `None` (8N1)
+- **Command**: Run `python tools/diagnostics/serial_monitor.py` (auto-detects CH340 serial port).
