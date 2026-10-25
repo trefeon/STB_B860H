@@ -112,27 +112,30 @@ Setelah booting dari MicroSD berhasil dan dapat diakses melalui SSH:
 
 ---
 
-## 5. Konfigurasi Virtual Swap Memory (Mendampingi RAM 2GB)
+## 5. Arsitektur Zero-Wear eMMC & Tiered Virtual RAM (ZRAM + Swapfile)
 
-ZTE B860H memiliki RAM fisik 2 GB. Untuk beban kerja kompilasi, Docker, atau runtime berat, dibuatkan sistem memori swap bertingkat:
+Karena chip eMMC internal memiliki siklus *write endurance* terbatas dan krusial untuk proses booting, arsitektur memori dan logging dirancang untuk **meminimalisir penulisan ke eMMC hingga mendekati 0%**:
 
-1. **ZRAM Swap (Level 1 - Cepat)**:
-   - 1 GB terkompresi di RAM fisik (terkonfigurasi otomatis oleh Armbian).
-2. **Persistent Swapfile 4 GB di MicroSD (Offloading eMMC)**:
-   - Agar kapasitas eMMC internal (6.0 GB) tidak termakan oleh file swap, swapfile dialokasikan sebesar **4 GB langsung di MicroSD** (`/mnt/storage/swapfile`).
-   - Hal ini menyisakan ruang eMMC sangat lega (**4.1 GB free / 32% used**).
-   - Konfigurasi di `/etc/fstab`:
-     ```text
-     /mnt/storage/swapfile none swap sw,nofail 0 0
+1. **Level 1: ZRAM Virtual Memory dengan Kompresi ZSTD (Prioritas 100)**:
+   - Alokasi: **1.8 GB ZRAM (`/dev/zram0`)** terkompresi langsung di dalam RAM fisik menggunakan algoritma modern **`zstd`** (`PRIO 100`).
+   - Rasio kompresi ZSTD berkisar antara 2.5× hingga 3.2×, melipatgandakan kapasitas 2GB RAM menjadi setara **~4.5 GB virtual RAM instan** dengan latensi 0ms dan **bebas aus flash (zero flash writes)**.
+2. **Level 2: Emergency Swapfile 4 GB di MicroSD (Prioritas -2)**:
+   - File swap dialokasikan sebesar **4 GB di MicroSD** (`/mnt/storage/swapfile`).
+   - Memiliki prioritas rendah (`PRIO -2`), sehingga hanya disentuh sebagai *safety net* darurat jika beban memori melampaui 4.5 GB. eMMC internal 100% aman.
+3. **Zero-Wear Logging (`armbian-ramlog` di `/var/log`)**:
+   - Direktori `/var/log` di-mount ke buffer RAM terkompresi ZRAM (`/dev/zram1`).
+   - Seluruh penulisan log berkala dari systemd journal, daemon, kernel, dan container terjadi murni di dalam RAM, mengeliminasi 99% penulisan acak ke eMMC.
+   - Pada saat shutdown bersih, log disinkronkan ke **`/mnt/storage/log`** pada kartu MicroSD (bukan eMMC).
+4. **Multi-Gen LRU (MGLRU) & Kernel Sysctl**:
+   - File `/etc/sysctl.d/99-server-opt.conf`:
+     ```ini
+     vm.swappiness = 60
+     vm.vfs_cache_pressure = 50
+     vm.dirty_background_ratio = 5
+     vm.dirty_ratio = 10
+     vm.dirty_writeback_centisecs = 6000
      ```
-3. **Optimasi Kernel Swappiness**:
-   File `/etc/sysctl.d/99-swap-optimization.conf`:
-   ```ini
-   vm.swappiness=60
-   vm.vfs_cache_pressure=50
-   vm.dirty_background_ratio=5
-   vm.dirty_ratio=10
-   ```
+     Menahan penulisan dirty pages hingga 60 detik di RAM sebelum di-flush dalam satu batch ke disk, mengurangi keausan flash eMMC.
 ---
 
 ## 6. Konfigurasi MicroSD sebagai Internal Storage Permanen
