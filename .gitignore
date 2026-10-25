@@ -18,6 +18,7 @@ Thumbs.db
 *.img.xz
 *.img.gz
 *.exe
+!tools/ampack.exe
 *.zip
 *.log
 *.bak
