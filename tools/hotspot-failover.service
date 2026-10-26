@@ -1,0 +1,8 @@
+[Unit]
+Description=Hotspot failover check (AP up when uplink down)
+After=NetworkManager.service
+Wants=NetworkManager.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/hotspot-failover.sh

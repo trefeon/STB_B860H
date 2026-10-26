@@ -121,7 +121,9 @@ def patch_dtb(filepath=TARGET_DTB):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Patch DTB pin config to redirect reset-gpios of SDIO Wi-Fi from pin 85 (0x55) to 76 (0x4c).")
-    parser.add_argument("dtb_path", nargs="?", default=TARGET_DTB, help="Path to the DTB file (default: f:\\dtb\\amlogic\\meson-gxl-s905x-p212.dtb)")
-    
+    parser.add_argument("dtb_path", nargs="?", default=None, help="Path to the DTB file to patch in place (required)")
+
     args = parser.parse_args()
+    if not args.dtb_path:
+        parser.error("dtb_path is required")
     patch_dtb(args.dtb_path)

@@ -1,6 +1,7 @@
 import gzip
 import struct
 import os
+import sys
 
 def find_and_read_header_in_gz(gz_filepath):
     if not os.path.exists(gz_filepath):
@@ -46,5 +47,6 @@ def find_and_read_header_in_gz(gz_filepath):
             
     print("Scan complete.")
 
-# Scan the Tertechan 6.1.137 image
-find_and_read_header_in_gz(r"d:\STB_B860H\[Tertechan] ZTE B860H V1-V2 no eMMC\Bahan\Armbian_25.05.0_amlogic_s905x_noble_6.1.137_server_2025.05.05.img.gz")
+if len(sys.argv) < 2:
+    sys.exit(f"Usage: {sys.argv[0]} <image.img.gz>")
+find_and_read_header_in_gz(sys.argv[1])

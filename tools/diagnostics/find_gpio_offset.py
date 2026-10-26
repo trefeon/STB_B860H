@@ -1,5 +1,6 @@
 import struct
 import os
+import sys
 
 def find_reset_gpios_offset(filepath):
     with open(filepath, 'rb') as f:
@@ -65,4 +66,6 @@ def find_reset_gpios_offset(filepath):
     print("Could not find reset-gpios property for sdio-pwrseq")
     return None
 
-find_reset_gpios_offset(r"f:\dtb\amlogic\meson-gxl-s905x-p212.dtb")
+if len(sys.argv) < 2:
+    sys.exit(f"Usage: {sys.argv[0]} <dtb-file>")
+find_reset_gpios_offset(sys.argv[1])

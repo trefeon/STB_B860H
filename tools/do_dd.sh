@@ -2,7 +2,7 @@
 # Resolve script's directory and move to repo root
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR/.."
-UBOOT="boot/uboot_HG680P.bin"
+UBOOT="firmware/uboot_HG680P-sdboot.bin"
 IMG="Armbian_patched.img"
 
 echo "=== U-boot: $UBOOT ==="

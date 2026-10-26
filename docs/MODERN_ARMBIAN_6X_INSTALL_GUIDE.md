@@ -1,71 +1,71 @@
-# Panduan Lengkap: Instalasi Modern Armbian (Kernel 6.x LTS), Pembersihan PPPwn, Migrasi eMMC, dan Storage MicroSD pada ZTE B860H
+# Complete Guide: Modern Armbian Installation (Kernel 6.x LTS), PPPwn Cleanup, eMMC Migration, and MicroSD Storage on the ZTE B860H
 
-Panduan ini mendokumentasikan investigasi teknis, pembersihan firmware pihak ketiga (PPPwn PS4 HEN), instalasi **Armbian modern (Debian 12 Bookworm / Linux Kernel 6.12.y LTS)**, migrasi sistem ke internal eMMC, setup Swap Memory, serta pemanfaatan kartu MicroSD sebagai media penyimpanan internal permanen pada STB **ZTE ZXV10 B860H V1/V2 (Amlogic S905X)**.
-
----
-
-## 📋 Daftar Isi
-1. [Identifikasi & Pembersihan Firmware Bekas Marketplace (PPPwn)](#1-identifikasi--pembersihan-firmware-bekas-marketplace-pppwn)
-2. [Pemilihan Image & Persiapan MicroSD Modern (Kernel 6.12 LTS)](#2-pemilihan-image--persiapan-microsd-modern-kernel-612-lts)
-3. [Troubleshooting Booting MicroSD: Fix ALERT UUID Initramfs](#3-troubleshooting-booting-microsd-fix-alert-uuid-initramfs)
-4. [Migrasi Sistem ke eMMC Internal (`armbian-install`)](#4-migrasi-sistem-ke-emmc-internal-armbian-install)
-5. [Konfigurasi Virtual Swap Memory (Mendampingi RAM 2GB)](#5-konfigurasi-virtual-swap-memory-mendampingi-ram-2gb)
-6. [Konfigurasi MicroSD sebagai Internal Storage Permanen](#6-konfigurasi-microsd-sebagai-internal-storage-permanen)
-7. [Skrip Otomasi & Diagnostik Repositori](#7-skrip-otomasi--diagnostik-repositori)
+This guide documents the technical investigation, cleanup of third-party firmware (PPPwn PS4 HEN), installation of **modern Armbian (Debian 12 Bookworm / Linux Kernel 6.12.y LTS)**, migration of the system to the internal eMMC, Swap Memory setup, and use of a MicroSD card as permanent internal storage media on the **ZTE ZXV10 B860H V1/V2 (Amlogic S905X)** STB.
 
 ---
 
-## 1. Identifikasi & Pembersihan Firmware Bekas Marketplace (PPPwn)
+## 📋 Table of Contents
+1. [Identifying & Cleaning Marketplace Firmware Leftovers (PPPwn)](#1-identifying--cleaning-marketplace-firmware-leftovers-pppwn)
+2. [Image Selection & Modern MicroSD Preparation (Kernel 6.12 LTS)](#2-image-selection--modern-microsd-preparation-kernel-612-lts)
+3. [MicroSD Boot Troubleshooting: Fixing the Initramfs ALERT UUID](#3-microsd-boot-troubleshooting-fixing-the-initramfs-alert-uuid)
+4. [Migrating the System to Internal eMMC (`armbian-install`)](#4-migrating-the-system-to-internal-emmc-armbian-install)
+5. [Virtual Swap Memory Configuration (Companion to 2GB RAM)](#5-virtual-swap-memory-configuration-companion-to-2gb-ram)
+6. [Configuring MicroSD as Permanent Internal Storage](#6-configuring-microsd-as-permanent-internal-storage)
+7. [Repository Automation & Diagnostic Scripts](#7-repository-automation--diagnostic-scripts)
 
-Banyak STB B860H bekas di pasaran dijual sebagai dongle otomatis *PlayStation 4 Jailbreak* (PPPwn) menggunakan basis Armbian 21.08 (Ubuntu 20.04 Focal) yang telah dimodifikasi oleh script seperti `STB-Pwn` (fork dari Stooged `PI-Pwn`).
+---
 
-### Temuan Analisis:
-- **Celah Akses / Web UI**: Port 80 menjalankan Nginx + PHP-FPM tanpa autentikasi yang mengeksekusi perintah shell sebagai `www-data`.
-- **Privilege Sudoers**: Penjual menambahkan entri `www-data ALL=(ALL) NOPASSWD: ALL` di `/etc/sudoers`.
-- **Spam Log & Partisi Boot Penuh**:
-  - Partisi log `zram1` (50MB) 100% penuh oleh auth.log dan monitoring.
-  - Partisi `/boot` FAT32 (122MB) 100% penuh akibat file recovery `FSCK*.REC` dan file APK acak (`MiBi TiVi`, `ROOT TV`, `Yacine TV`).
-- **Loop Proses Eksploit**: `pppwn64` berjalan non-stop di interface `eth0`, membebani CPU dan memicu panas.
+## 1. Identifying & Cleaning Marketplace Firmware Leftovers (PPPwn)
 
-### Prosedur Pembersihan:
+Many second-hand B860H boxes on the market are sold as automatic *PlayStation 4 Jailbreak* dongles (PPPwn) based on Armbian 21.08 (Ubuntu 20.04 Focal) modified by scripts such as `STB-Pwn` (a fork of Stooged's `PI-Pwn`).
+
+### Analysis Findings:
+- **Access Gap / Web UI**: Port 80 runs Nginx + PHP-FPM without authentication, executing shell commands as `www-data`.
+- **Sudoers Privilege**: The seller added a `www-data ALL=(ALL) NOPASSWD: ALL` entry in `/etc/sudoers`.
+- **Log Spam & Full Boot Partition**:
+  - The `zram1` log partition (50MB) was 100% full from auth.log and monitoring.
+  - The FAT32 `/boot` partition (122MB) was 100% full due to `FSCK*.REC` recovery files and random APK files (`MiBi TiVi`, `ROOT TV`, `Yacine TV`).
+- **Exploit Process Loop**: `pppwn64` runs non-stop on the `eth0` interface, loading the CPU and causing heat.
+
+### Cleanup Procedure:
 ```bash
-# 1. Hentikan service dan matikan proses exploit
+# 1. Stop services and kill exploit processes
 systemctl stop pipwn pppoe dtlink nginx php7.4-fpm dnsmasq
 killall -9 pppwn64 pppwn7 pppwn11 timeout
 systemctl disable pipwn pppoe dtlink nginx php7.4-fpm dnsmasq
 rm -f /etc/systemd/system/pipwn.service /etc/systemd/system/pppoe.service /etc/systemd/system/dtlink.service
 systemctl daemon-reload
 
-# 2. Hapus sisa file PPPwn dan bersihkan rc.local
+# 2. Remove PPPwn leftovers and clean rc.local
 rm -rf /boot/firmware/PPPwn /media/pwndrives /etc/udev/rules.d/99-pwnmnt.rules
 sed -i '/PPPwn/d' /etc/rc.local
 sed -i '/devboot.sh/d' /etc/rc.local
 
-# 3. Pulihkan sudoers dan flush iptables
+# 3. Restore sudoers and flush iptables
 sed -i '/www-data.*ALL/d' /etc/sudoers
 iptables -P INPUT ACCEPT && iptables -P FORWARD ACCEPT && iptables -P OUTPUT ACCEPT
 iptables -t nat -F && iptables -t mangle -F && iptables -F && iptables -X
 
-# 4. Bersihkan partisi /boot dari file sampah
+# 4. Clean junk files from the /boot partition
 rm -f /boot/*.apk /boot/*.dpkg-bak /boot/FSCK*.REC
 rm -rf /boot/LOST.DIR /boot/Android /boot/firmware
 ```
 
 ---
 
-## 2. Pemilihan Image & Persiapan MicroSD Modern (Kernel 6.12 LTS)
+## 2. Image Selection & Modern MicroSD Preparation (Kernel 6.12 LTS)
 
-Untuk menjalankan Linux modern, gunakan build teruji dari proyek **Ophub Amlogic**:
-- **Image Resmi**: `Armbian_26.11.0_amlogic_s905x-b860h_bookworm_6.12.112_server_2026.10.15.img.gz` (Debian 12 Bookworm, Kernel 6.12.112 LTS).
-- **Tool Download**: `tools/download_and_prep_image.py` (download dan decompress otomatis ke `D:/Armbian_b860h.img`).
-- **Tool Flashing Windows**: `tools/flash_sd.py` (menulis langsung ke raw block `\\.\PhysicalDriveX` dengan ctypes kernel32 API).
+To run modern Linux, use the tested build from the **Ophub Amlogic** project:
+- **Official Image**: `Armbian_26.11.0_amlogic_s905x-b860h_bookworm_6.12.112_server_2026.10.15.img.gz` (Debian 12 Bookworm, Kernel 6.12.112 LTS).
+- **Download Tool**: `tools/download_image.sh` (downloads + decompresses to `Armbian_b860h.img` in the current directory, or a directory you pass).
+- **Windows Flashing Tool**: `tools/flash_sd.py` (writes directly to the raw block `\\.\PhysicalDriveX` using the ctypes kernel32 API).
 
 ---
 
-## 3. Troubleshooting Booting MicroSD: Fix ALERT UUID Initramfs
+## 3. MicroSD Boot Troubleshooting: Fixing the Initramfs ALERT UUID
 
-### Gejala Masalah:
-Saat MicroSD pertama kali diboot pada TV box, proses boot U-Boot dan Kernel berhasil, tetapi proses terhenti di prompt BusyBox dengan error:
+### Symptoms:
+When the MicroSD card is first booted on the TV box, the U-Boot and kernel boot process succeeds, but the process stalls at the BusyBox prompt with the error:
 ```text
 Begin: Waiting for root file system ... Begin: Running /scripts/local-block ... done.
 done.
@@ -78,54 +78,54 @@ BusyBox v1.37.0 (Ubuntu 1:1.37.0-7ubuntu1) built-in shell (ash)
 (initramfs) 
 ```
 
-### Penyebab:
-Driver MMC (`meson-gx-mmc`) membutuhkan waktu 3-5 detik untuk mengenali slot kartu MicroSD, namun initramfs default Ubuntu/Debian memeriksa UUID secara instan dan langsung menyerah (*timeout*).
+### Cause:
+The MMC driver (`meson-gx-mmc`) needs 3-5 seconds to detect the MicroSD card slot, but the default Ubuntu/Debian initramfs checks the UUID instantly and gives up immediately (*timeout*).
 
-### Solusi Permanen di `uEnv.txt`:
-Colokkan kembali MicroSD ke PC, buka partisi `BOOT` (FAT32), lalu edit baris `APPEND` di file `uEnv.txt`:
+### Permanent Fix in `uEnv.txt`:
+Plug the MicroSD card back into the PC, open the `BOOT` (FAT32) partition, then edit the `APPEND` line in the `uEnv.txt` file:
 ```text
 LINUX=/zImage
 INITRD=/uInitrd
 FDT=/dtb/amlogic/meson-gxl-s905x-b860h.dtb
 APPEND=root=LABEL=ROOTFS rootdelay=10 rootflags=data=writeback rw rootwait rootfstype=ext4 console=ttyAML0,115200n8 console=tty0 no_console_suspend consoleblank=0 fsck.fix=yes fsck.repair=yes net.ifnames=0 max_loop=128 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory swapaccount=1 video=HDMI-A-1:1920x1080@60e plymouth.enable=0
 ```
-- **`root=LABEL=ROOTFS`**: Mencari langsung label partisi ext4 tanpa bergantung pada resolusi UUID udev yang tertunda.
-- **`rootdelay=10`**: Memberi jeda 10 detik penuh agar controller SD card terinisialisasi sempurna.
+- **`root=LABEL=ROOTFS`**: Looks up the ext4 partition label directly without relying on delayed udev UUID resolution.
+- **`rootdelay=10`**: Provides a full 10-second delay so the SD card controller initializes completely.
 
 ---
 
-## 4. Migrasi Sistem ke eMMC Internal (`armbian-install`)
+## 4. Migrating the System to Internal eMMC (`armbian-install`)
 
-Setelah booting dari MicroSD berhasil dan dapat diakses melalui SSH:
+After booting from MicroSD succeeds and is reachable via SSH:
 
-1. Jalankan script instalasi eMMC:
+1. Run the eMMC installation script:
    ```bash
    sudo armbian-install
    ```
-2. Masukkan parameter berikut saat prompt muncul:
-   - **Box ID**: Masukkan `106` (Model ZTE B860H, SoC `s905x`, DTB `meson-gxl-s905x-b860h.dtb`).
-   - **Root Filesystem**: Masukkan `1` (`ext4`).
-3. Script otomatis melakukan:
-   - Backup bootloader eMMC asli ke `/usr/lib/u-boot/mybox-bootloader.img`.
-   - Mempartisi ulang eMMC internal menjadi partisi boot lega **512 MB** (`BOOT_EMMC`) dan sisa **6.1 GB** untuk root (`ROOTFS_EMMC`).
-   - Menyalin bootloader, kernel, dan rsync seluruh file rootfs ke eMMC.
+2. Enter the following parameters when prompted:
+   - **Box ID**: Enter `106` (ZTE B860H model, `s905x` SoC, `meson-gxl-s905x-b860h.dtb` DTB).
+   - **Root Filesystem**: Enter `1` (`ext4`).
+3. The script automatically:
+   - Backs up the original eMMC bootloader to `/usr/lib/u-boot/mybox-bootloader.img`.
+   - Repartitions the internal eMMC into a spacious **512 MB** boot partition (`BOOT_EMMC`) and the remaining **6.1 GB** for root (`ROOTFS_EMMC`).
+   - Copies the bootloader and kernel, and rsyncs the entire rootfs files to eMMC.
 
 ---
 
-## 5. Arsitektur Zero-Wear eMMC & Tiered Virtual RAM (ZRAM + Swapfile)
+## 5. Zero-Wear eMMC Architecture & Tiered Virtual RAM (ZRAM + Swapfile)
 
-Karena chip eMMC internal memiliki siklus *write endurance* terbatas dan krusial untuk proses booting, arsitektur memori dan logging dirancang untuk **meminimalisir penulisan ke eMMC hingga mendekati 0%**:
+Because the internal eMMC chip has limited *write endurance* cycles and is critical to the boot process, the memory and logging architecture is designed to **minimize writes to eMMC to near 0%**:
 
-1. **Level 1: ZRAM Virtual Memory dengan Kompresi ZSTD (Prioritas 100)**:
-   - Alokasi: **1.8 GB ZRAM (`/dev/zram0`)** terkompresi langsung di dalam RAM fisik menggunakan algoritma modern **`zstd`** (`PRIO 100`).
-   - Rasio kompresi ZSTD berkisar antara 2.5× hingga 3.2×, melipatgandakan kapasitas 2GB RAM menjadi setara **~4.5 GB virtual RAM instan** dengan latensi 0ms dan **bebas aus flash (zero flash writes)**.
-2. **Level 2: Emergency Swapfile 4 GB di MicroSD (Prioritas -2)**:
-   - File swap dialokasikan sebesar **4 GB di MicroSD** (`/mnt/storage/swapfile`).
-   - Memiliki prioritas rendah (`PRIO -2`), sehingga hanya disentuh sebagai *safety net* darurat jika beban memori melampaui 4.5 GB. eMMC internal 100% aman.
-3. **Zero-Wear Logging (`armbian-ramlog` di `/var/log`)**:
-   - Direktori `/var/log` di-mount ke buffer RAM terkompresi ZRAM (`/dev/zram1`).
-   - Seluruh penulisan log berkala dari systemd journal, daemon, kernel, dan container terjadi murni di dalam RAM, mengeliminasi 99% penulisan acak ke eMMC.
-   - Pada saat shutdown bersih, log disinkronkan ke **`/mnt/storage/log`** pada kartu MicroSD (bukan eMMC).
+1. **Level 1: ZRAM Virtual Memory with ZSTD Compression (Priority 100)**:
+   - Allocation: **1.8 GB ZRAM (`/dev/zram0`)** compressed directly inside physical RAM using the modern **`zstd`** algorithm (`PRIO 100`).
+   - The ZSTD compression ratio ranges from 2.5x to 3.2x, multiplying the 2GB RAM capacity into the equivalent of **~4.5 GB of instant virtual RAM** with 0ms latency and **zero flash wear (zero flash writes)**.
+2. **Level 2: 4 GB Emergency Swapfile on MicroSD (Priority -2)**:
+   - The swap file is allocated at **4 GB on the MicroSD card** (`/mnt/storage/swapfile`).
+   - It has low priority (`PRIO -2`), so it is only touched as an emergency *safety net* if memory load exceeds 4.5 GB. The internal eMMC stays 100% safe.
+3. **Zero-Wear Logging (`armbian-ramlog` in `/var/log`)**:
+   - The `/var/log` directory is mounted to a compressed ZRAM RAM buffer (`/dev/zram1`).
+   - All periodic log writes from the systemd journal, daemons, kernel, and containers happen purely in RAM, eliminating 99% of random writes to eMMC.
+   - On a clean shutdown, logs are synced to **`/mnt/storage/log`** on the MicroSD card (not eMMC).
 4. **Multi-Gen LRU (MGLRU) & Kernel Sysctl**:
    - File `/etc/sysctl.d/99-server-opt.conf`:
      ```ini
@@ -135,47 +135,47 @@ Karena chip eMMC internal memiliki siklus *write endurance* terbatas dan krusial
      vm.dirty_ratio = 10
      vm.dirty_writeback_centisecs = 6000
      ```
-     Menahan penulisan dirty pages hingga 60 detik di RAM sebelum di-flush dalam satu batch ke disk, mengurangi keausan flash eMMC.
+     Holds dirty page writes in RAM for up to 60 seconds before flushing them to disk in a single batch, reducing eMMC flash wear.
 ---
 
-## 6. Konfigurasi MicroSD sebagai Internal Storage Permanen
+## 6. Configuring MicroSD as Permanent Internal Storage
 
-Agar STB otomatis mem-boot dari internal eMMC dan kartu MicroSD 32GB difungsikan sebagai harddisk penyimpanan data internal:
+So the STB automatically boots from the internal eMMC and the 32GB MicroSD card functions as an internal data storage drive:
 
-### Langkah Eksekusi:
-1. Setelah migrasi eMMC selesai, matikan STB (`poweroff`).
-2. Cabut kartu MicroSD, lalu nyalakan STB. STB akan mem-boot Armbian 6.12 langsung dari eMMC internal.
-3. Setelah masuk SSH di eMMC, **colokkan kembali kartu MicroSD** ke slot STB.
-4. Jalankan script format penyimpanan internal:
+### Execution Steps:
+1. After the eMMC migration finishes, power off the STB (`poweroff`).
+2. Remove the MicroSD card, then power on the STB. The STB will boot Armbian 6.12 directly from the internal eMMC.
+3. After logging in via SSH on eMMC, **reinsert the MicroSD card** into the STB slot.
+4. Run the internal storage formatting script:
    ```bash
    sudo /root/setup_sd_storage.sh
    ```
-   *(Atau jalankan manual perintah berikut)*:
+   *(Or run the following commands manually)*:
    ```bash
    parted -s /dev/mmcblk1 mklabel msdos
    parted -s /dev/mmcblk1 mkpart primary ext4 1MiB 100%
    mkfs.ext4 -F -q -L "SD_STORAGE" /dev/mmcblk1p1
    mkdir -p /mnt/storage
    mount /dev/mmcblk1p1 /mnt/storage
-   chown -R trefeon:trefeon /mnt/storage
+   chown -R <user>:<user> /mnt/storage
    chmod 775 /mnt/storage
    ```
-5. File `/etc/fstab` di eMMC sudah otomatis mengikat label `SD_STORAGE`:
+5. The `/etc/fstab` file on eMMC already binds the `SD_STORAGE` label automatically:
    ```text
    LABEL=SD_STORAGE /mnt/storage ext4 defaults,noatime,nodiratime,nofail 0 2
    ```
-6. **Arsitektur Offloading eMMC Total ke MicroSD (Bind-Mount & Docker)**:
-   Agar eMMC internal 6.0 GB tidak pernah penuh oleh cache, kode, repository, dan container Docker:
-   - **`/home/<user>` di-bind ke MicroSD**:
+6. **Total eMMC-to-MicroSD Offload Architecture (Bind-Mount & Docker)**:
+   So the 6.0 GB internal eMMC never fills up with caches, code, repositories, and Docker containers:
+   - **`/home/<user>` bound to MicroSD**:
      ```text
-     /mnt/storage/home_trefeon /home/<user> none defaults,bind,nofail 0 0
+     /mnt/storage/home_<user> /home/<user> none defaults,bind,nofail 0 0
      ```
-     Seluruh file pengguna, cache pip/npm, workspace VS Code, dan repositori git otomatis disimpan langsung di MicroSD 30 GB.
-   - **`/opt` di-bind ke MicroSD**:
+     All user files, pip/npm caches, VS Code workspaces, and git repositories are automatically stored directly on the 30 GB MicroSD card.
+   - **`/opt` bound to MicroSD**:
      ```text
      /mnt/storage/opt /opt none defaults,bind,nofail 0 0
      ```
-   - **Docker Root Dir Terisolasi di MicroSD (`/etc/docker/daemon.json`)**:
+   - **Docker Root Dir isolated on MicroSD (`/etc/docker/daemon.json`)**:
      ```json
      {
        "data-root": "/mnt/storage/docker",
@@ -186,164 +186,163 @@ Agar STB otomatis mem-boot dari internal eMMC dan kartu MicroSD 32GB difungsikan
        }
      }
      ```
-     Semua image, layer container, dan volume Docker otomatis hidup di MicroSD. User `trefeon` telah dimasukkan ke grup `docker` sehingga dapat menjalankan `docker run` tanpa `sudo`.
-   - **Pembatasan Log Systemd (`/etc/systemd/journald.conf.d/00-cap-size.conf`)**:
-     Ukuran log sistem dibatasi maksimal `50M` agar tidak memakan ruang eMMC.
+     All Docker images, container layers, and volumes automatically live on the MicroSD card. The `<user>` account has been added to the `docker` group so it can run `docker run` without `sudo`.
+   - **Systemd Log Limit (`/etc/systemd/journald.conf.d/00-cap-size.conf`)**:
+     System log size is capped at a maximum of `50M` so it does not consume eMMC space.
 ---
 
-## 7. Fix & Auto-Patching Driver Wi-Fi (RTL8189FS) & Bluetooth pada Kernel 6.x
+## 7. Wi-Fi Driver Fix & Auto-Patching (RTL8189FS) & Bluetooth on Kernel 6.x
 
-### A. Akar Masalah Teknis Wi-Fi RTL8189FS:
-1. **Out-of-tree Realtek Driver**: Realtek tidak pernah memasukkan modul `8189fs` ke source tree resmi kernel Linux (kernel.org), sehingga kernel Linux 6.x modern dari upstream tidak menyertakan modul ini secara default.
-2. **Perubahan API Linux 6.12 (`set_monitor_channel`)**:
-   Kernel 6.12 mengubah signature callback `set_monitor_channel` di `cfg80211_ops` dengan menambahkan parameter `struct net_device *dev`. Driver lama gagal dicompile dengan error `incompatible-pointer-types`.
-3. **Mismatch Toolchain GCC 12 vs 15**:
-   Kernel Ophub di-build menggunakan toolchain GCC 15, yang memasukkan flag `-fmin-function-alignment=4` dan binary `modpost` bertaut pada GLIBC 2.38. Di Debian 12 Bookworm (GCC 12 & GLIBC 2.36), flag ini harus diganti menjadi `-falign-functions=4` dan `modpost` di-recompile secara native.
+### A. Technical Root Cause of the RTL8189FS Wi-Fi Issue:
+1. **Out-of-tree Realtek Driver**: Realtek never merged the `8189fs` module into the official Linux kernel source tree (kernel.org), so modern upstream Linux 6.x kernels do not include this module by default.
+2. **Linux 6.12 API Change (`set_monitor_channel`)**:
+   Kernel 6.12 changed the `set_monitor_channel` callback signature in `cfg80211_ops` by adding a `struct net_device *dev` parameter. The old driver fails to compile with an `incompatible-pointer-types` error.
+3. **GCC 12 vs 15 Toolchain Mismatch**:
+   The Ophub kernel was built with the GCC 15 toolchain, which includes the `-fmin-function-alignment=4` flag and a `modpost` binary linked against GLIBC 2.38. On Debian 12 Bookworm (GCC 12 & GLIBC 2.36), this flag must be replaced with `-falign-functions=4` and `modpost` must be natively recompiled.
 
-### B. Akar Masalah Bluetooth B860H:
-1. STB ZTE B860H memiliki chip Wi-Fi murni (RTL8189FS tanpa Bluetooth terintegrasi).
-2. Device tree bawaan Amlogic P212 / B860H mengaktifkan node phantom Broadcom (`compatible = "brcm,bcm43438-bt"`) di UART `serial@84c0`.
-3. Akibatnya, setiap kali booting kernel mencoba menghubungi chip Broadcom yang tidak ada, memicu timeout `-110` dan menahan booting selama 15 detik.
-4. **Solusi**: Men-disable node phantom tersebut di DTB (`status = "disabled";`), memangkas waktu boot STB menjadi hanya **12 detik**! Jika user membutuhkan Bluetooth, cukup colokkan USB Bluetooth dongle standar yang didukung penuh oleh `btusb`.
+### B. Root Cause of the B860H Bluetooth Issue:
+1. The ZTE B860H STB has a pure Wi-Fi chip (RTL8189FS with no integrated Bluetooth).
+2. The stock Amlogic P212 / B860H device tree enables a Broadcom phantom node (`compatible = "brcm,bcm43438-bt"`) on UART `serial@84c0`.
+3. As a result, on every boot the kernel tries to contact a Broadcom chip that does not exist, triggering a `-110` timeout and stalling boot for 15 seconds.
+4. **Fix**: Disable that phantom node in the DTB (`status = "disabled";`), cutting STB boot time to just **12 seconds**! If you need Bluetooth, simply plug in a standard USB Bluetooth dongle fully supported by `btusb`.
 
-### C. Penggunaan Auto-Patch Turnkey:
-Jalankan skrip yang telah kami siapkan di STB:
+### C. Using the Turnkey Auto-Patch:
+Run the script we prepared on the STB:
 ```bash
 sudo /root/auto_patch_wifi_bt.sh
 ```
-Skrip ini otomatis:
-- Mengunduh dan memasang header kernel 6.12.112 dari repository Ophub.
-- Memperbaiki flag Makefile dan meng-compile `modpost` secara native.
-- Mengunduh, mem-patch API Linux 6.12, dan meng-compile modul `8189fs.ko`.
-- Memasang driver ke `/lib/modules/$(uname -r)/...`, mengaktifkan auto-load di `/etc/modules`.
-- Men-decompile dan menonaktifkan node ghost Broadcom di DTB eMMC.
+This script automatically:
+- Downloads and installs the 6.12.112 kernel headers from the Ophub repository.
+- Fixes the Makefile flag and natively compiles `modpost`.
+- Downloads, patches for the Linux 6.12 API, and compiles the `8189fs.ko` module.
+- Installs the driver to `/lib/modules/$(uname -r)/...` and enables auto-load in `/etc/modules`.
+- Decompiles and disables the Broadcom ghost node in the eMMC DTB.
 
 ---
 
-## 8. Integrasi Tailscale & Passwordless SSH Windows
+## 8. Tailscale Integration & Passwordless Windows SSH
 
-STB terhubung ke mesh VPN privat Tailscale (`<your-tailnet>.ts.net`) dan dikonfigurasi untuk otentikasi SSH berbasis kunci ed25519 tanpa password:
+The STB is connected to the private Tailscale VPN mesh (`<your-tailnet>.ts.net`) and configured for ed25519 key-based SSH authentication without a password:
 
-### A. IP Akses STB:
-- **LAN Kabel (`eth0`)**: `<STB-LAN-IP>`
-- **Wi-Fi Backup (`wlan0`)**: `<STB-WIFI-IP>`
+### A. STB Access IPs:
+- **Wired LAN (`eth0`)**: `<STB-LAN-IP>` (e.g. `192.168.1.100`)
+- **Backup Wi-Fi (`wlan0`)**: `<STB-WIFI-IP>`
 - **Tailscale VPN**: `<TAILSCALE-IP>`
 
-### B. Shortcut SSH di Windows (`~/.ssh/config`):
+### B. Windows SSH Shortcuts (`~/.ssh/config`):
 ```ssh-config
 Host stb stb-local stb-lan
     HostName <STB-LAN-IP>
-    User trefeon
+    User <user>
     IdentityFile ~/.ssh/id_ed25519
     StrictHostKeyChecking accept-new
 
 Host stb-wifi
     HostName <STB-WIFI-IP>
-    User trefeon
+    User <user>
     IdentityFile ~/.ssh/id_ed25519
     StrictHostKeyChecking accept-new
 
 Host stb-ts b860h-ts armbian-ts
     HostName <TAILSCALE-IP>
-    User trefeon
+    User <user>
     IdentityFile ~/.ssh/id_ed25519
     StrictHostKeyChecking accept-new
 ```
 
-Kini Anda dapat langsung me-remote STB dari terminal Windows/PowerShell tanpa mengetik password sama sekali:
+You can now remote directly into the STB from a Windows terminal/PowerShell without typing a password at all:
 ```bash
-ssh stb       # Akses via LAN kabel
-ssh stb-wifi  # Akses via Wi-Fi backup
-ssh stb-ts    # Akses dari mana saja di luar rumah via Tailscale
+ssh stb       # Access via wired LAN (<STB-LAN-IP>)
+ssh stb-wifi  # Access via backup Wi-Fi (<STB-WIFI-IP>)
+ssh stb-ts    # Access from anywhere outside the home via Tailscale (<TAILSCALE-IP>)
 ```
 
 ---
 
-## 9. Skrip Otomasi & Diagnostik Repositori
+## 9. Repository Automation & Diagnostic Scripts
 
-| File | Fungsi |
+| File | Function |
 | :--- | :--- |
-| **`tools/auto_patch_wifi_bt.sh`** | Auto-compiler dan installer driver Wi-Fi RTL8189FS serta DTB Bluetooth cleaner untuk Kernel 6.x. |
-| **`tools/diagnostics/ssh_check.sh`** | Suite diagnostik remote native SSH (Kernel, RAM, Swap, Suhu, Uptime, Wi-Fi, Storage Layout, Systemd). |
-| **`tools/diagnostics/*.sh`** | Skrip Bash diagnostik: `check_optimizations.sh`, `check_bluetooth.sh`, `reboot_and_check.sh`, `install_essentials.sh`. |
-| **`tools/optimizations/apply_optimizations.sh`** | Skrip otomatisasi tuning kernel sysctl, TCP BBR, zram, CPU governor, dan batas journald via SSH. |
-| **`tools/download_and_prep_image.py`** | Downloader otomatis image Ophub Armbian terbaru & decompressor `.img.gz` $\to$ `.img`. |
-| **`tools/flash_sd.py`** | Flasher raw disk direct block I/O Windows via Win32 ctypes API (`\\.\PhysicalDriveX`). |
-| **`tools/run_flash.bat`** | Launcher elevated UAC untuk `flash_sd.py`. |
-| **`boot/meson-gxl-s905x-b860h.dtb`** | Device Tree resmi B860H untuk Linux Kernel 6.x. |
+| **`tools/auto_patch_wifi_bt.sh`** | Auto-compiler and installer for the RTL8189FS Wi-Fi driver and DTB Bluetooth cleaner for Kernel 6.x. |
+| **`tools/diagnostics/ssh_check.sh`** | Native SSH remote diagnostic suite (Kernel, RAM, Swap, Temperature, Uptime, Wi-Fi, Storage Layout, Systemd). |
+| **`tools/diagnostics/*.sh`** | Bash diagnostic scripts: `check_optimizations.sh`, `check_bluetooth.sh`, `reboot_and_check.sh`, `install_essentials.sh`. |
+| **`tools/optimizations/apply_optimizations.sh`** | Automated tuning script for kernel sysctl, TCP BBR, zram, CPU governor, and journald limits via SSH. |
+| **`tools/download_image.sh`** | Ophub Armbian image downloader (`curl`) + `.img.gz` decompressor (`gunzip`). |
+| **`tools/flash_sd.py`** | Windows direct raw-disk block I/O flasher via the Win32 ctypes API (`\\.\PhysicalDriveX`) — run `python tools/flash_sd.py` as Administrator. |
+| **`boot/meson-gxl-s905x-b860h.dtb`** | Official B860H Device Tree for Linux Kernel 6.x. |
 
 ---
 
-## 10. Hardware Debugging: Pinout Serial UART TTL B860H
+## 10. Hardware Debugging: B860H TTL Serial UART Pinout
 
-Jika STB mengalami kendala bootloader (layar hitam / bootloop) atau membutuhkan monitoring level rendah:
+If the STB hits a bootloader problem (black screen / bootloop) or needs low-level monitoring:
 
 ![ZTE B860H UART Pinout](assets/b860h_uart_pinout.png)
 
-### Skema Pin Header `X2` (Dekat Lubang Baut PCB):
-- **Top Row**: **`Gnd`** (Ground) $\to$ Hubungkan ke **GND** USB-TTL.
-- **Bottom Left**: **`Tx`** (Transmit STB) $\to$ Hubungkan ke **RXD** USB-TTL.
-- **Bottom Right**: **`Rx`** (Receive STB) $\to$ Hubungkan ke **TXD** USB-TTL.
-- **VCC**: **JANGAN DIHUBUNGKAN** (STB sudah ditenagai adaptor 12V).
+### `X2` Pin Header Layout (Near the PCB Screw Hole):
+- **Top Row**: **`Gnd`** (Ground) $\to$ Connect to USB-TTL **GND**.
+- **Bottom Left**: **`Tx`** (STB Transmit) $\to$ Connect to USB-TTL **RXD**.
+- **Bottom Right**: **`Rx`** (STB Receive) $\to$ Connect to USB-TTL **TXD**.
+- **VCC**: **DO NOT CONNECT** (the STB is already powered by the 12V adapter).
 
-### Monitoring Serial Log Real-time:
+### Real-time Serial Log Monitoring:
 ```bash
-python tools/diagnostics/serial_monitor.py
+python tools/diagnostics/boot_monitor.py
 ```
-*(Baudrate: `115200`, 8N1, otomatis mendeteksi adapter serial CH340).*
+*(Baudrate: `115200`, 8N1, automatically detects each reboot, timestamps + stall verdict. `serial_monitor.py` as the raw tee fallback).*
 
 ---
 
 ## 11. Troubleshooting & Playbook: eMMC Cold Boot & MicroSD Storage
 
-Bab ini mendokumentasikan temuan kritis tingkat hardware dan playbook pemecahan masalah untuk arsitektur dual-storage (**eMMC Internal + MicroSD Storage**) pada ZTE B860H:
+This chapter documents critical hardware-level findings and the troubleshooting playbook for the dual-storage architecture (**Internal eMMC + MicroSD Storage**) on the ZTE B860H:
 
-### A. Masalah 1: Layar Hitam (*Crash*) Akibat Kode Bootstrap x86 di MicroSD
-- **Gejala**: STB langsung mati/membeku di layar hitam pekat (*blackscreen*) setiap kali kartu MicroSD dicolokkan saat power-on.
-- **Akar Masalah**:
-  1. Hardware BootROM Amlogic S905X selalu mengecek slot MicroSD (`MMC 0`) sebelum membaca eMMC (`MMC 1`).
-  2. Saat MicroSD diformat menggunakan perintah Linux `parted mklabel msdos` atau utilitas partisi PC biasa, program tersebut menulis kode bootstrap x86 PC-DOS (`fa b8 00 10...` = instruksi mesin x86 `CLI; MOV AX, 0x1000`) ke bytes 0–445 pada sektor 0 MBR.
-  3. Karena BootROM S905X berbasis **ARM64 (Cortex-A53)**, saat prosesor mencoba mengeksekusi byte x86 tersebut, prosesor langsung mengalami *undefined instruction hardware crash* seketika sebelum sempat menyentuh eMMC internal!
-- **Solusi Sanitasi Sektor 0**:
-  Nol-kan (zero-fill) area bootstrap bytes 0–445 pada sektor 0 MicroSD tanpa menghapus tabel partisi (bytes 446–509) dan signature `0x55AA`:
-  ```python
-  # Script Python sanitasi MBR (tools/sanitize_sd_mbr.py)
-  with open(r"\\.\PhysicalDriveX", "r+b") as f:
-      mbr = bytearray(f.read(512))
-      for i in range(446):
-          mbr[i] = 0x00  # Bersihkan instruksi x86
-      mbr[446] = 0x00    # Pastikan partisi tidak berstatus active boot
-      f.seek(0)
-      f.write(mbr)
+### A. Issue 1: Black Screen (*Crash*) Caused by x86 Bootstrap Code on MicroSD
+- **Symptoms**: The STB dies/freezes immediately on a pitch-black screen (*blackscreen*) every time the MicroSD card is inserted at power-on.
+- **Root Cause**:
+  1. The Amlogic S905X hardware BootROM always checks the MicroSD slot (`MMC 0`) before reading eMMC (`MMC 1`).
+  2. When the MicroSD card is formatted with the Linux `parted mklabel msdos` command or an ordinary PC partitioning utility, that program writes PC-DOS x86 bootstrap code (`fa b8 00 10...` = x86 machine instructions `CLI; MOV AX, 0x1000`) to bytes 0-445 of MBR sector 0.
+  3. Because the S905X BootROM is **ARM64 (Cortex-A53)** based, when the processor tries to execute those x86 bytes, it immediately suffers an *undefined instruction hardware crash* before ever reaching the internal eMMC!
+- **Sector 0 Sanitization Fix** (now automatic in `tools/partition_usb_android.py` when preparing Android USB, or manual via Git Bash):
+  ```bash
+  # Zero bootstrap bytes 0-445, keep the partition table + 0x55AA (X = SD drive, CHECK FIRST!)
+  dd if=/dev/zero of=/dev/sdX bs=1 count=446 conv=notrunc
   ```
-  Setelah disanitasi, BootROM Amlogic mengenali MicroSD sebagai *pure data storage* dan langsung melompat ke internal eMMC.
+  After sanitization, the Amlogic BootROM recognizes the MicroSD card as *pure data storage* and jumps straight to the internal eMMC.
 
 ---
 
-### B. Masalah 2: Layar Hitam (*Cold Boot Hang*) Akibat NVRAM eMMC Belum Disimpan
-- **Gejala**: STB bisa reboot normal saat warm-reboot (`sudo reboot`), tetapi jika adaptor dicabut lalu dicolok kembali (*cold boot*), STB tidak mau booting dan layar monitor tetap hitam pekat.
-- **Akar Masalah**:
-  1. Skrip resmi `armbian-install` menyalin file sistem ke partisi eMMC FAT32 (`mmc 1:1`), tetapi **tidak memperbarui variabel environment bawaan U-Boot (`bootcmd`) di chip NVRAM eMMC (`0x3ee00000`)**.
-  2. Saat cold boot (RAM kosong dari nol), U-Boot mengeksekusi nilai default pabrik:
+### B. Issue 2: Black Screen (*Cold Boot Hang*) Caused by Unsaved eMMC NVRAM
+- **Symptoms**: The STB reboots fine on a warm reboot (`sudo reboot`), but if the adapter is unplugged and plugged back in (*cold boot*), the STB refuses to boot and the monitor screen stays pitch black.
+- **Root Cause**:
+  1. The official `armbian-install` script copies system files to the eMMC FAT32 partition (`mmc 1:1`), but **does not update the built-in U-Boot environment variable (`bootcmd`) in the eMMC NVRAM chip (`0x3ee00000`)**.
+  2. On a cold boot (RAM empty from zero), U-Boot executes the factory default value:
      ```text
      bootcmd = run storeboot
      storeboot = if imgread kernel boot ${loadaddr}; then bootm ${loadaddr}; fi; run update;
      ```
-  3. U-Boot mencari partisi kernel Android lama. Karena Android sudah dihapus oleh Armbian, U-Boot gagal membaca kernel (`Err imgread ... Fmt unsupported`) dan berhenti di prompt konsol darurat:
+  3. U-Boot looks for the old Android kernel partition. Since Android was wiped by Armbian, U-Boot fails to read the kernel (`Err imgread ... Fmt unsupported`) and stops at the emergency console prompt:
      ```text
      gxl_p212_v1#
      ```
-  Hubungkan serial USB TTL ke header `X2` (115200 baud). Pada prompt `gxl_p212_v1#`, jalankan:
+  Connect a USB TTL serial cable to the `X2` header (115200 baud). At the `gxl_p212_v1#` prompt, run:
   ```bash
   setenv bootcmd "if fatload mmc 1:1 0x1020000 emmc_autoscript; then autoscr 0x1020000; fi; if fatload mmc 0:1 0x1020000 s905_autoscript; then autoscr 0x1020000; fi; run storeboot"
   saveenv
   ```
-  Perintah `saveenv` akan menuliskan konfigurasi ini secara permanen ke chip storage eMMC (`Writing to MMC(1)... done`). Setelah itu, STB akan otomatis bootloader mandiri 100% pada setiap *cold boot* maupun mati listrik.
+  The `saveenv` command permanently writes this configuration to the eMMC storage chip (`Writing to MMC(1)... done`). After that, the STB will boot with a 100% standalone bootloader on every *cold boot* and power outage.
+  **Final implementation note (this STB)**: the autoscript was rewritten deterministically (explicit `mmc 1:1`, no USB/SD probing, no `saveenv` inside; dual files `emmc_autoscript` + `aml_autoscript` in `/boot`, compiled on the STB via `mkimage`) and `bootcmd` was simplified before saving:
+  ```bash
+  setenv bootcmd 'fatload mmc 1:1 0x01020000 emmc_autoscript; autoscr 0x01020000'
+  saveenv
+  ```
+  Warning: do not send U-Boot commands containing `${...}` through a string-based SSH tool (variables may be lost before they arrive) — use literals or an interactive/Python serial session.
 
 
-### C. Masalah 3: Deployment Offline Driver Wi-Fi & DTB Pre-Built
-Untuk menghindari download kernel headers (~70MB) dan kompilasi manual pada STB baru:
+
+### C. Issue 3: Offline Wi-Fi Driver & Pre-Built DTB Deployment
+To avoid downloading kernel headers (~70MB) and manual compilation on a new STB:
   ```bash
   bash tools/ship_patch.sh stb
   ```
-  Wi-Fi langsung aktif dan node phantom Bluetooth dibersihkan dalam waktu **< 2 detik tanpa internet**.
+  Wi-Fi becomes active immediately and the Bluetooth phantom node is cleaned up in **< 2 seconds with no internet**.

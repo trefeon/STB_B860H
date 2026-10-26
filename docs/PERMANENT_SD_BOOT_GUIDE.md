@@ -54,7 +54,7 @@ Once the CLK line is disabled:
 1. **Power Connected**: The SoC BootROM powers on and attempts to read the eMMC.
 2. **Immediate Timeout**: Due to the missing clock signal, the eMMC does not respond. The BootROM immediately times out (~10ms).
 3. **SD Card Failover**: The BootROM moves to `mmc0` (MicroSD slot).
-4. **Bootloader Loaded**: The BootROM reads Sector 0/1 of the SD card, detects the injected `uboot_HG680P.bin` signature, loads it into DRAM, and boots.
+4. **Bootloader Loaded**: The BootROM reads Sector 0/1 of the SD card, detects the injected `uboot_HG680P-sdboot.bin` signature, loads it into DRAM, and boots.
 5. **Auto-Boot Armbian**: The SD card U-Boot starts, reads the custom `aml_autoscript` from the SD card BOOT partition, and boots Armbian Linux directly.
 
 No buttons, serial consoles, or keyboards are required. The TV box behaves exactly like a standard single-board computer (like a Raspberry Pi), booting directly from the SD card.

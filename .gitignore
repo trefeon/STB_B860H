@@ -18,7 +18,7 @@ Thumbs.db
 *.img.xz
 *.img.gz
 *.exe
-!tools/ampack.exe
+!tools/vendor/ampack.exe
 *.zip
 *.log
 *.bak
@@ -27,3 +27,10 @@ __pycache__/
 
 
 
+# Stock Android ROM archives (kept on disk inside the repo, too big for git)
+packages/stock-roms/
+
+# Local run artifacts (never published)
+logs/
+live_*.log
+.env

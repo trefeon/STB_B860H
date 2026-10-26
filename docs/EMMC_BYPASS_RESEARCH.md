@@ -76,7 +76,7 @@ When the eMMC NAND dies completely (no bus response):
 2. eMMC produces no response → hardware bus timeout (~1 second).
 3. BootROM advances to the **next device: mmc0 (SD card)**.
 4. BootROM reads SD sector 0, looking for a valid Amlogic BL2 signature.
-5. Finds our injected `uboot_HG680P.bin` → proceeds to boot.
+5. Finds our injected `uboot_HG680P-sdboot.bin` → proceeds to boot.
 
 **This is the only window the bypass exploits.**
 
@@ -103,7 +103,7 @@ Vendor U-Boot → reads aml_autoscript from mmc0:1 (SD BOOT partition)
 aml_autoscript → s905_autoscript → extlinux/uEnv.txt → Linux kernel
 ```
 
-The legacy multiboot `aml_autoscript` (`boot/legacy/aml_autoscript_multiboot.txt`):
+The legacy multiboot `aml_autoscript` (`firmware/legacy/aml_autoscript_multiboot.txt`):
 
 ```text
 setenv start_mmc_autoscript "if fatload mmc 0 1020000 s905_autoscript; then autoscr 1020000; fi;"
@@ -140,17 +140,17 @@ Two `dd` operations are required:
 
 ```bash
 # Op 1: Bootstrap (bytes 0-441, before MBR partition table)
-dd if=uboot_HG680P.bin of=/dev/sdX conv=fsync,notrunc bs=1 count=442
+dd if=firmware/uboot_HG680P-sdboot.bin of=/dev/sdX conv=fsync,notrunc bs=1 count=442
 
 # Op 2: U-Boot body (from byte 512 onward, sector 1+)
-dd if=uboot_HG680P.bin of=/dev/sdX conv=fsync,notrunc bs=512 skip=1 seek=1
+dd if=firmware/uboot_HG680P-sdboot.bin of=/dev/sdX conv=fsync,notrunc bs=512 skip=1 seek=1
 ```
 
 The `conv=notrunc` flag prevents erasing the OS partitions beyond the bootloader region. The partition table at bytes 442-511 is intentionally left intact.
 
-This is automated by [`tools/patch_uboot.py`](file:///D:/STB_B860H/tools/patch_uboot.py) and [`tools/do_dd.sh`](file:///D:/STB_B860H/tools/do_dd.sh).
+This is automated by [`tools/patch_uboot.py`](../tools/patch_uboot.py) and [`tools/do_dd.sh`](../tools/do_dd.sh).
 
-### Why `uboot_HG680P.bin` Works on the B860H
+### Why `uboot_HG680P-sdboot.bin` Works on the B860H
 
 Both devices share the same **Amlogic S905X SoC** and nearly identical board layouts:
 
@@ -313,7 +313,7 @@ Power On
   ├─ BootROM probes mmc1 (eMMC) → hardware timeout (dead)
   └─ BootROM probes mmc0 (SD card) → finds Amlogic BL2 signature
         ↓
-  BL2: DDR3 initialization (uboot_HG680P.bin)
+  BL2: DDR3 initialization (uboot_HG680P-sdboot.bin)
   BL30: System Control Processor firmware
   BL31: Secure Monitor (maps 0x0–0x1000000 as TrustZone secure)
   BL33: U-Boot (from SD raw sectors)

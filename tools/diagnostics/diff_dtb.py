@@ -1,5 +1,6 @@
 import struct
 import os
+import sys
 
 def dump_nodes(filepath):
     if not os.path.exists(filepath):
@@ -121,6 +122,8 @@ def compare_nodes(mainline_nodes, wifi_nodes):
                     else:
                         print(f"  * {p}: Mainline: {format_val(v_m)} | WiFi: {format_val(v_w)}")
 
-m_nodes = dump_nodes(r"f:\dtb\amlogic\meson-gxl-s905x-p212.dtb")
-w_nodes = dump_nodes(r"d:\STB_B860H\04-file-dtb-wifi\meson-gxl-s905x-p212.dtb")
+if len(sys.argv) < 3:
+    sys.exit(f"Usage: {sys.argv[0]} <mainline.dtb> <other.dtb>")
+m_nodes = dump_nodes(sys.argv[1])
+w_nodes = dump_nodes(sys.argv[2])
 compare_nodes(m_nodes, w_nodes)

@@ -10,9 +10,11 @@ import time
 import ctypes
 from ctypes import wintypes
 
-DRIVE_PATH = r"\\.\PhysicalDrive2"
-VOLUME_PATH = r"\\.\F:"
-IMG_PATH = r"D:\custom_rom_build\custom_system.img"
+# Usage: python tools/flash_android_p2.py [drive] [volume] [image]  (defaults below;
+#   verify the disk number in Disk Management first, e.g. image D:\custom_rom_build\custom_system.img)
+DRIVE_PATH = sys.argv[1] if len(sys.argv) > 1 else r"\\.\PhysicalDrive2"
+VOLUME_PATH = sys.argv[2] if len(sys.argv) > 2 else r"\\.\F:"
+IMG_PATH = sys.argv[3] if len(sys.argv) > 3 else r"custom_system.img"
 PART2_LBA = 526336
 
 GENERIC_READ = 0x80000000

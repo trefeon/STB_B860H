@@ -4,7 +4,8 @@ Automatically connects to ZTE B860H U-Boot prompt over USB serial (CH340/COM)
 and commits the permanent autoboot command to eMMC NVRAM via saveenv.
 
 Usage:
-  python tools/set_uboot_autoboot.py [--port COM5] [--baud 115200]
+  python tools/set_uboot_autoboot.py [--port <COM-PORT>] [--baud 115200]
+  (e.g. --port COM5 on Windows; auto-detects CH340/CP210/FTDI adapters when omitted)
 """
 
 import sys
@@ -31,7 +32,7 @@ def auto_detect_port():
 
 def main():
     parser = argparse.ArgumentParser(description="Set permanent U-Boot autoboot command in B860H eMMC NVRAM")
-    parser.add_argument("--port", help="COM port (e.g. COM5)")
+    parser.add_argument("--port", help="Serial port (<COM-PORT>; e.g. COM5 on Windows)")
     parser.add_argument("--baud", type=int, default=115200, help="Baud rate (default: 115200)")
     args = parser.parse_args()
 

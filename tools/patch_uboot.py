@@ -15,7 +15,7 @@ import glob
 
 # Resolve paths relative to the repository root (one level up from this script's directory)
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-UBOOT = os.path.join(REPO_ROOT, "boot", "uboot_HG680P.bin")
+UBOOT = os.path.join(REPO_ROOT, "firmware", "uboot_HG680P-sdboot.bin")
 
 # Dynamically find the .img.xz file in the repository root
 xz_files = glob.glob(os.path.join(REPO_ROOT, "*.img.xz"))

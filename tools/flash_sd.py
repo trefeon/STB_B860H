@@ -7,10 +7,13 @@ import time
 import ctypes
 from ctypes import wintypes
 
-# Disk 2
-DRIVE_PATH = r"\\.\PhysicalDrive2"
-VOLUME_PATH = r"\\.\F:"
-IMG_PATH = r"D:\Armbian_b860h.img"
+# Disk 2 (example; verify your SD card's disk number in Disk Management first!)
+# Usage: python tools/flash_sd.py [drive] [volume] [image]
+#   (defaults: PhysicalDrive2, F:, Armbian_b860h.img in the current directory;
+#   e.g. python tools/flash_sd.py \\.\PhysicalDrive2 \\.\F: D:\Armbian_b860h.img)
+DRIVE_PATH = sys.argv[1] if len(sys.argv) > 1 else r"\\.\PhysicalDrive2"
+VOLUME_PATH = sys.argv[2] if len(sys.argv) > 2 else r"\\.\F:"
+IMG_PATH = sys.argv[3] if len(sys.argv) > 3 else r"Armbian_b860h.img"
 
 GENERIC_READ = 0x80000000
 GENERIC_WRITE = 0x40000000

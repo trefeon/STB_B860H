@@ -11,7 +11,8 @@ import struct
 import sys
 import os
 
-DRIVE_NAME = r"\\.\PhysicalDrive2"
+# Usage: python tools/partition_usb_android.py [drive]  (default: \\.\PhysicalDrive2)
+DRIVE_NAME = sys.argv[1] if len(sys.argv) > 1 else r"\\.\PhysicalDrive2"
 
 def main():
     print(f"Opening {DRIVE_NAME} for partitioning...")

@@ -1,5 +1,6 @@
 import struct
 import os
+import sys
 
 def parse_dtb(filepath):
     if not os.path.exists(filepath):
@@ -124,7 +125,9 @@ def parse_dtb(filepath):
         'size': totalsize
     }
 
-print("=== Mainline DTB ===")
-mainline = parse_dtb(r"f:\dtb\amlogic\meson-gxl-s905x-p212.dtb")
-print("\n=== WiFi DTB (from forums) ===")
-wifi_dtb = parse_dtb(r"d:\STB_B860H\04-file-dtb-wifi\meson-gxl-s905x-p212.dtb")
+if len(sys.argv) < 2:
+    sys.exit(f"Usage: {sys.argv[0]} <a.dtb> [b.dtb ...]")
+for _dtb in sys.argv[1:]:
+    print(f"=== {_dtb} ===")
+    parse_dtb(_dtb)
+    print()

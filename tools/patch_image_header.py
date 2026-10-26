@@ -83,8 +83,10 @@ def patch_kernel_header(filepath, new_offset):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Patch ARM64 kernel Image text_offset to bypass Secure Monitor / TrustZone crash.")
-    parser.add_argument("image_path", nargs="?", default=TARGET_FILE, help="Path to the kernel 'Image' file (default: f:\\Image)")
+    parser.add_argument("image_path", nargs="?", default=None, help="Path to the kernel 'Image' file to patch (required)")
     parser.add_argument("--offset", type=lambda x: int(x, 0), default=TARGET_OFFSET, help="New text_offset value (default: 0x1080000 / 16.5 MB)")
-    
+
     args = parser.parse_args()
+    if not args.image_path:
+        parser.error("image_path is required")
     patch_kernel_header(args.image_path, args.offset)

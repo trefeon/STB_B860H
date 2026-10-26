@@ -25,18 +25,22 @@ This document summarizes all the investigations, architectural fixes, repository
 The workspace was reorganized from a cluttered root directory into three logical directories to improve maintainability and follow clean coding standards:
 
 ```text
-d:\STB_B860H/
-├── boot/                        # Consolidated bootloader files and scripts
-│   ├── legacy/                  # Legacy flashing utilities and param files
-│   │   └── usb-unlock/          # Legacy USB unlock files
+<repo-checkout>/
+├── boot/                        # Active boot scripts (compiled + source)
 │   ├── aml_autoscript           # Compiled direct-boot autoscript
 │   ├── aml_autoscript.cmd       # Source script code
-│   ├── uboot_B860H.bin          # Consolidate B860H U-Boot bin
-│   └── uboot_HG680P.bin         # Consolidated HG680P U-Boot bin
+│   ├── emmc_autoscript          # Compiled deterministic eMMC boot script
+│   └── emmc_autoscript.cmd      # Source script code
+├── firmware/                    # Bootloader binaries, stock DTB, legacy unbrick set
+│   ├── legacy/                  # Legacy flashing utilities and param files
+│   │   └── usb-unlock/          # Legacy USB unlock files
+│   ├── uboot_B860H-emmc-stock.bin # Stock B860H eMMC-only U-Boot (encrypted blob, reference)
+│   ├── uboot_HG680P-sdboot.bin    # SD-boot-capable U-Boot (used by patch_uboot.py / do_dd.sh)
+│   └── meson-gxl-s905x-p212-stock-unpatched.dtb # Stock reference DTB (Wi-Fi pin 85)
 ├── tools/                       # Flashing, patching and optimization scripts
 │   ├── diagnostics/             # Serial monitor, dumper, checking scripts
 │   │   ├── find_gpio_offset.py  # Dynamically scans DTB offsets
-│   │   └── serial_monitor.py    # Live UART port monitor (default COM9)
+│   │   └── serial_monitor.py    # Live UART port monitor (auto-detects CH340 serial port)
 │   ├── optimizations/           # Governor and system optimization configs
 │   ├── patch_uboot.py           # Injects custom U-Boot into SD sectors
 │   ├── patch_dtb.py             # Patches Wi-Fi reset GPIO
@@ -51,22 +55,22 @@ d:\STB_B860H/
 
 ---
 
-## 3. SD Card (F: Drive) Validation and Modification
+## 3. SD Card (Windows Drive) Validation and Modification
 
-When the user mounted the SD card on Windows (allocated as drive `F:\`), we ran diagnostic checks and applied the necessary patches:
+When the SD card was mounted on Windows (as a drive letter, e.g. `F:`), we ran diagnostic checks and applied the necessary patches:
 
-1. **Kernel Image (`F:\Image`)**:
+1. **Kernel Image** (`<sd-drive>:\Image`, e.g. `F:\Image`):
    - Detected a default `text_offset` of `0x0`.
    - Executed `patch_image_header.py` and successfully updated the header offset to `0x1080000`.
-2. **Device Tree (`F:\dtb\amlogic\meson-gxl-s905x-p212.dtb`)**:
+2. **Device Tree (`<sd-drive>:\dtb\amlogic\meson-gxl-s905x-p212.dtb`)**:
    - Dynamically mapped the DTB nodes and found the Wi-Fi power reset pin property at offset `28256` (`0x6e60`).
    - Executed `patch_dtb.py` and successfully updated the reset pin value from `85` to `76`.
-3. **Autoscript (`F:\aml_autoscript`)**:
+3. **Autoscript** (`<sd-drive>:\aml_autoscript`):
    - Discovered the SD card had the reboot-prone multi-boot script.
    - Replaced it with the direct-boot `boot/aml_autoscript` version.
-4. **Boot Configuration (`F:\uEnv.txt`)**:
+4. **Boot Configuration** (`<sd-drive>:\uEnv.txt`):
    - Read the partition tables of `Armbian_patched.img` using python, located the ext4 Partition 2 superblock, and verified its UUID: `04783cdc-7f19-4f7c-8b96-05afe33d8a46`.
-   - Verified that `F:\uEnv.txt` is correctly configured with `root=UUID=04783cdc-7f19-4f7c-8b96-05afe33d8a46`.
+   - Verified that `<sd-drive>:\uEnv.txt` is correctly configured with `root=UUID=04783cdc-7f19-4f7c-8b96-05afe33d8a46`.
 
 ---
 
@@ -83,11 +87,11 @@ A new, healthy ZTE ZXV10 B860H hardware unit was acquired to replace the previou
 - **Initial Access**: Gained root shell via unauthenticated Nginx/PHP-FPM web UI left by the seller on port 80 running with `www-data ALL=(ALL) NOPASSWD: ALL` in sudoers.
 - **Purged Artifacts**: Removed `pipwn`, `pppoe`, `dtlink` daemons, killed running `pppwn64` process, purged Nginx and PHP packages, and cleaned `/etc/rc.local`.
 - **Cleaned `/boot` Partition**: Deleted over 50 MB of leftover seller APK files and corrupted `FSCK*.REC` records that filled the 122MB FAT boot partition.
-- **Credential Setup**: Set password for `root` and created administrative user `trefeon` (`<stb-password>`).
+- **Credential Setup**: Set a private password for `root` and created administrative user `<user>` (password `<stb-password>`, chosen at install and never published).
 
 ### B. Modern Armbian 6.12 LTS Deployment
 - **Image Selected**: `Armbian_26.11.0_amlogic_s905x-b860h_bookworm_6.12.112_server_2026.10.15` (Debian 12 Bookworm, Kernel 6.12.112 LTS by Ophub).
-- **Turnkey Windows Flashing**: Wrote `tools/download_and_prep_image.py` (downloaded and decompressed 3.5GB raw image) and `tools/flash_sd.py` (direct block writing via Win32 ctypes API to `\\.\PhysicalDrive2` at 16.2 MB/s).
+- **Turnkey Windows Flashing**: Wrote `tools/download_image.sh` (downloaded and decompressed 3.5GB raw image) and `tools/flash_sd.py` (direct block writing via Win32 ctypes API to a raw `\\.\PhysicalDriveN` disk — verify the disk number in Disk Management — at 16.2 MB/s).
 - **Initramfs Timeout Fix**: Resolved `ALERT! UUID=... does not exist` by configuring `root=LABEL=ROOTFS rootdelay=10` in `uEnv.txt`.
 
 ### C. Full eMMC Migration (`armbian-install`)
@@ -112,7 +116,7 @@ A new, healthy ZTE ZXV10 B860H hardware unit was acquired to replace the previou
 ### B. Docker CE & Docker Compose
 - Installed official Docker CE 29.9.2 and Docker Compose plugin 5.6.1 on ARM64.
 - Configured Docker daemon root to MicroSD (`"data-root": "/mnt/storage/docker"` in `/etc/docker/daemon.json`), ensuring all images, layers, and volumes live on the SD card.
-- Added `trefeon` to the `docker` group for passwordless container execution.
+- Added `<user>` to the `docker` group for passwordless container execution.
 
 ### C. Wi-Fi Failover & Network Routing
 - Fixed driver out-of-tree Realtek RTL8189FS for Linux Kernel 6.12 via `tools/auto_patch_wifi_bt.sh` and disabled phantom Broadcom Bluetooth in the DTB.
@@ -130,18 +134,41 @@ A new, healthy ZTE ZXV10 B860H hardware unit was acquired to replace the previou
 
 ### A. The MicroSD x86 MBR Crash Trap
 - **Issue**: When formatting the MicroSD card with `parted mklabel msdos`, standard x86 bootstrap machine code was written to sector 0 (bytes 0–445). Because Amlogic hardware BootROM prioritizes the MicroSD slot over eMMC, the ARM64 Cortex-A53 processor attempted to execute x86 instructions, triggering an illegal instruction crash before eMMC was probed.
-- **Fix**: Developed `tools/sanitize_sd_mbr.py` to zero out bytes 0–445 while preserving the partition table (bytes 446–509) and the `0x55AA` signature, allowing clean BootROM fallback to eMMC.
+- **Fix**: Zero out bytes 0–445 while preserving the partition table (bytes 446–509) and the `0x55AA` signature, allowing clean BootROM fallback to eMMC (originally `tools/sanitize_sd_mbr.py`, now folded into `tools/partition_usb_android.py`; manual equivalent: `dd if=/dev/zero of=/dev/sdX bs=1 count=446 conv=notrunc`).
 
 ### B. eMMC U-Boot NVRAM `bootcmd` Resolution
 - **Issue**: The `armbian-install` script populated the FAT32 boot partition (`mmc 1:1`), but left the vendor U-Boot NVRAM environment (`0x3ee00000`) untouched (`bootcmd=run storeboot`). On cold boot, U-Boot fell back to an interactive prompt `gxl_p212_v1#` because Android kernel was missing, causing a persistent black screen on HDMI.
-- **Fix**: Captured the live U-Boot shell via hardware UART `X2` (COM5 @ 115200 baud) and permanently committed the autoboot sequence to eMMC NVRAM via `saveenv`:
+- **Fix**: Captured the live U-Boot shell via hardware UART `X2` (`<COM-PORT>`, e.g. `COM5` on Windows, @ 115200 baud) and permanently committed the autoboot sequence to eMMC NVRAM via `saveenv`:
   ```bash
   setenv bootcmd "if fatload mmc 1:1 0x1020000 emmc_autoscript; then autoscr 0x1020000; fi; if fatload mmc 0:1 0x1020000 s905_autoscript; then autoscr 0x1020000; fi; run storeboot"
   saveenv
   ```
+  **Follow-up refactor**: the autoscript was rewritten deterministically (explicit `mmc 1:1`, no USB/SD probing, no `saveenv` inside; dual files `emmc_autoscript` + `aml_autoscript`, compiled on the STB via `mkimage`) and `bootcmd` was simplified to `fatload mmc 1:1 0x01020000 emmc_autoscript; autoscr 0x01020000` before `saveenv`. Lesson learned: never send U-Boot commands containing `${...}` through string-based SSH tooling (variables can be lost before they arrive) — use literals or an interactive/Python serial session.
+
 
 ### C. Pre-Built Offline Patch Package (`packages/b860h_patch/`)
 - Extracted tested production binaries directly from the live STB:
   - `packages/b860h_patch/8189fs.ko` (3.05 MB)
   - `packages/b860h_patch/meson-gxl-s905x-b860h.dtb` (40.8 KB)
 - Created turnkey installer `packages/b860h_patch/install.sh` and host deployment script `tools/ship_patch.sh` for instant, offline Wi-Fi & Bluetooth patching on newly installed units without downloading or compiling.
+
+---
+
+## 8. Kernel 6.12.112 → 6.12.114 Update Incident (2026-10-26)
+
+### A. NVRAM `bootcmd` Loss → Dead Box
+- **Issue**: After `armbian-update -k 6.12.114`, the box never returned (no LAN, no Tailscale, Tailscale `last seen` frozen at updater reboot). UART showed U-Boot stopping after autoboot with no `reading emmc_autoscript`; interactive check confirmed `bootcmd=run storeboot` (default env) at `gxl_p212_v1#`. The saved deterministic `bootcmd` was gone; env sector `0x3ee00000` reads as high-entropy (consistent with vendor AES-encrypted env — corruption vs overwrite indistinguishable from Linux). eMMC healthy (`pre_eol_info 0x01`, `life_time 0x01`); journal is ramlog-volatile so the shutdown left no trace.
+- **Fix**: Restored `setenv bootcmd 'fatload mmc 1:1 0x01020000 emmc_autoscript; autoscr 0x01020000'` + `saveenv` via UART (`logs/uart_shell.py`), box booted 6.12.114 hands-off (verified over a second reboot cycle).
+
+### B. Vendor Default Boot Path Is a Proven Dead End
+- `run storeboot` captured live over UART (`logs/storeboot_probe.log`, catcher `logs/uart_catch.py`): imgread logo fail → USB-burn check → SD check → USB storage scan (`Bad device usb 0`) → prompt. It never probes any autoscript (`s905`/`aml`/`boot.ini`/`fatload` absent from the trace). Placing files cannot rescue a default-env box; only the NVRAM `bootcmd` (or a resident custom U-Boot behind it) boots this unit.
+
+### C. Live eMMC Bootloader Identity Settled
+- `dd` of eMMC bootloader region (`/tmp/bl.dump`, kept at `logs/bl-emmc-live.dump`, sha256 `bd3cb4a5…`) vs `firmware/uboot_HG680P-sdboot.bin`: identical except **26 bytes in `0x1ba–0x1ff`** (MBR partition-table area). The eMMC bootloader IS the HG680P-derived binary, not a separate B860H stock build. Payload is encrypted/compressed (Rizin `iz` yields only noise; plain `strings` finds nothing) — static analysis needs FIP-aware unpacking or the decrypted runtime image.
+- `[EFUSE_MSG] keynum is 4` confirmed in boot log: secure chain intact, eMMC bootloader replacement stays off-limits; RAM chainload (`u-boot.ext` via `go`) remains the safe custom-U-Boot path.
+
+### D. `armbian-update` Quirks (Ophub, Oct 2026)
+- First run can fail transiently on its `curl github.com` check (no scheme) — retry works.
+- `update_initrd_addr` hard-fails if `/boot/emmc_autoscript.cmd` lacks `setenv initrd_addr`: added compat line `setenv initrd_addr 0x15000000` (unused at boot, literal addresses unchanged) to `boot/emmc_autoscript.cmd` + STB twins, recompiled on-STB via `mkimage`.
+- Reinstall path needs `-b no` (backup step looks for replaced `-6.12.112` files); full backup already in `/ddbr/backup/6.12.112`.
+- Post-update mandatory: re-patch DTB (stock returns, phantom BT node back) + rebuild `8189fs` against new headers (`tools/auto_patch_wifi_bt.sh` shipped via `scp`, runs on-STB). Refreshed `packages/b860h_patch/` to 6.12.114 (`8189fs.ko` vermagic `6.12.114-ophub`, DTB 40925 B patched).

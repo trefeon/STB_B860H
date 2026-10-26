@@ -32,7 +32,7 @@ Amlogic SoCs have a hardcoded ROM bootloader (BL1) that scans boot media for a v
 
 ### MBR Partition Protection
 
-To make the SD card bootable while keeping its partitions intact, we must write a custom U-Boot binary (`uboot_HG680P.bin`) to the Master Boot Record (Sector 0) and the sectors immediately following it. However, we must **never overwrite the MBR partition table** (bytes 442 to 511 in sector 0), otherwise the partition boundaries will be lost, corrupting the FAT and ext4 partitions.
+To make the SD card bootable while keeping its partitions intact, we must write the SD-boot-capable U-Boot binary (`uboot_HG680P-sdboot.bin`) to the Master Boot Record (Sector 0) and the sectors immediately following it. However, we must **never overwrite the MBR partition table** (bytes 442 to 511 in sector 0), otherwise the partition boundaries will be lost, corrupting the FAT and ext4 partitions.
 
 ### The DD Injection Scheme
 
@@ -49,7 +49,7 @@ The injection is divided into two operations:
 | <-- Written (dd 1)-->| Kept Intact        |   | <-- Written (dd 2) --------->|
 ```
 
-In python, this is implemented in [patch_uboot.py](file:///D:/STB_B860H/tools/patch_uboot.py):
+In python, this is implemented in [patch_uboot.py](../tools/patch_uboot.py):
 
 ```python
 # Write bootstrap code
@@ -83,7 +83,7 @@ We patch the kernel image file (`/Image` on the FAT32 boot partition) by modifyi
 * **Patch Value**: `0x1080000` (16.5 MB).
 * **Hex String**: `00 00 08 01 00 00 00 00`
 
-Once patched, U-Boot relocates the kernel to `0x01080000`, bypassing the secure memory region and allowing the kernel to boot normally. This is implemented in [patch_image_header.py](file:///D:/STB_B860H/tools/patch_image_header.py).
+Once patched, U-Boot relocates the kernel to `0x01080000`, bypassing the secure memory region and allowing the kernel to boot normally. This is implemented in [patch_image_header.py](../tools/patch_image_header.py).
 
 ---
 
@@ -108,7 +108,7 @@ We patch the compiled DTB (`/dtb/amlogic/meson-gxl-s905x-p212.dtb`) to change th
   * **Patched**: `00 00 00 15 00 00 00 4c 00 00 00 01` (Pin 76 / `0x4c`)
 * **File Offset**: `28280` (may vary depending on DTB build, but can be located dynamically by searching for the byte sequence).
 
-This is implemented in [patch_dtb.py](file:///D:/STB_B860H/tools/patch_dtb.py).
+This is implemented in [patch_dtb.py](../tools/patch_dtb.py).
 
 ---
 
@@ -149,7 +149,7 @@ Follow these exact steps if your SD card becomes corrupted or you need to build 
 
 ### Step 2: Inject the Custom Bootloader
 
-1. Run [patch_uboot.py](file:///D:/STB_B860H/tools/patch_uboot.py) (or [`do_dd.sh`](file:///D:/STB_B860H/tools/do_dd.sh)) targeting the output image file or the raw SD card drive. This injects `boot/uboot_HG680P.bin` while keeping the partition table safe.
+1. Run [patch_uboot.py](../tools/patch_uboot.py) (or [`do_dd.sh`](../tools/do_dd.sh)) targeting the output image file or the raw SD card drive. This injects `firmware/uboot_HG680P-sdboot.bin` while keeping the partition table safe.
 
 ### Step 3: Configure `uEnv.txt` & Copy Autoscript
 
@@ -171,8 +171,8 @@ Mount the `BOOT` partition of the SD card:
 
 Run the following helper scripts to patch the files directly on the mounted SD card partition:
 
-1. Run [patch_image_header.py](file:///D:/STB_B860H/tools/patch_image_header.py) to set the text offset of `BOOT:\Image` to `0x1080000`.
-2. Run [patch_dtb.py](file:///D:/STB_B860H/tools/patch_dtb.py) to modify the Wi-Fi reset GPIO pin in `BOOT:\dtb\amlogic\meson-gxl-s905x-p212.dtb` to pin `76`.
+1. Run [patch_image_header.py](../tools/patch_image_header.py) to set the text offset of `BOOT:\Image` to `0x1080000`.
+2. Run [patch_dtb.py](../tools/patch_dtb.py) to modify the Wi-Fi reset GPIO pin in `BOOT:\dtb\amlogic\meson-gxl-s905x-p212.dtb` to pin `76`.
 
 ### Step 5: Boot and Resolve First-Boot Wi-Fi Hangs
 
